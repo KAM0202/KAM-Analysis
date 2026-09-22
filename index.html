@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAM Analysis - Moneyball GM Talent ID Suite</title>
+    <title>KAM Analysis - FIFA Style GM Intelligence Suite</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,11 +23,10 @@
                         obsidian: '#07090e',
                         panel: '#0f131c',
                         card: '#161c28',
-                        roseSoft: {
-                            DEFAULT: '#e12948',
-                            light: '#fb7185',
-                            border: 'rgba(225, 41, 72, 0.25)',
-                            bg: 'rgba(225, 41, 72, 0.08)'
+                        status: {
+                            good: '#10b981',    /* Green */
+                            caution: '#f59e0b', /* Yellow/Gold */
+                            warning: '#f43f5e'  /* Rose/Red */
                         }
                     },
                     fontFamily: {
@@ -43,202 +42,135 @@
     <style>
         body { background-color: #07090e; color: #f8fafc; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .font-tech { font-family: 'Chakra Petch', sans-serif; }
-        .glass-panel { background: rgba(15, 19, 28, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(225, 41, 72, 0.2); }
+        .glass-panel { background: rgba(15, 19, 28, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .glass-card { background: rgba(22, 28, 40, 0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.06); }
         .pitch-soccer { background: radial-gradient(circle, #0c1a13 0%, #050806 100%); }
-        .selected-player { border-color: #fb7185 !important; box-shadow: 0 0 12px rgba(251, 113, 133, 0.3); }
-        .kam-pill { background: rgba(225, 41, 72, 0.12); border: 1px solid rgba(251, 113, 133, 0.3); color: #fb7185; }
+        .fifa-card-selected { border-color: #f59e0b !important; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); transform: scale(1.03); }
+        
+        /* Intuitive Metric Badges */
+        .badge-good { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; }
+        .badge-caution { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b; }
+        .badge-warning { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.4); color: #f43f5e; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-roseSoft selection:text-white relative">
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950 relative">
 
     <!-- HEADER -->
-    <header class="glass-panel sticky top-0 z-50 border-b border-roseSoft-border px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+    <header class="glass-panel sticky top-0 z-50 border-b border-slate-800 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-slate-900 border border-roseSoft-border flex items-center justify-center text-roseSoft-light font-black text-xl shadow-md">
-                <i class="fa-solid fa-briefcase"></i>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg">
+                <i class="fa-solid fa-gamepad"></i>
             </div>
             <div>
                 <h1 class="text-xl font-tech font-black tracking-wider text-white flex items-center gap-2">
-                    KAM <span class="text-roseSoft-light">GM WORKSPACE</span>
-                    <span id="active-league-pill" class="text-[10px] font-mono px-2 py-0.5 rounded-full kam-pill">Premier League</span>
+                    KAM <span class="text-amber-400">GM SUITE</span>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full badge-good">FIFA Engine Active</span>
                 </h1>
-                <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Brighton / Bristol Style Talent ID & Market Mining Engine</p>
+                <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Multi-Club Tactical Intelligence Workspace</p>
             </div>
         </div>
 
-        <!-- AUTO REFRESH STATUS -->
-        <div class="flex items-center space-x-2 bg-obsidian px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-mono">
-            <span class="relative flex h-2.5 w-2.5">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
-            <span class="text-slate-400">Live Engine: <span id="refresh-timer" class="text-emerald-400 font-bold">30s</span></span>
-            <button onclick="triggerManualRefresh()" class="ml-2 text-slate-400 hover:text-white"><i class="fa-solid fa-rotate"></i></button>
-        </div>
-
-        <!-- FRANCHISE SELECTOR -->
+        <!-- CLUB SELECTOR -->
         <div class="flex items-center space-x-2 bg-panel p-1.5 rounded-xl border border-slate-800 text-xs">
-            <span class="font-mono text-slate-400 px-1"><i class="fa-solid fa-shield-halved text-roseSoft-light"></i> FRANCHISE:</span>
-            <select id="team-selector" onchange="switchTeam(this.value)" class="bg-obsidian text-roseSoft-light font-bold py-1.5 px-2.5 rounded-lg border border-slate-800 focus:outline-none focus:border-roseSoft cursor-pointer font-mono">
+            <span class="font-mono text-slate-400 px-1"><i class="fa-solid fa-shield-halved text-amber-400"></i> CLUB:</span>
+            <select id="team-selector" onchange="switchTeam(this.value)" class="bg-obsidian text-amber-400 font-bold py-1.5 px-2.5 rounded-lg border border-slate-800 focus:outline-none focus:border-amber-500 cursor-pointer font-mono">
                 <option value="BHA" selected>Brighton & Hove Albion (KAM 8.7)</option>
                 <option value="ARS">Arsenal FC (KAM 8.9)</option>
-                <option value="BRC">Bristol City FC (KAM 7.8)</option>
                 <option value="MCI">Manchester City (KAM 9.4)</option>
+                <option value="MUN">Manchester United (KAM 8.5)</option>
+                <option value="RMA">Real Madrid (KAM 9.5)</option>
+                <option value="BAR">FC Barcelona (KAM 9.1)</option>
             </select>
         </div>
 
         <nav class="flex items-center space-x-1 bg-panel p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
-            <button id="tab-btn-squad" onclick="switchTab('squad')" class="tab-btn px-3.5 py-2 rounded-lg transition-all bg-roseSoft text-white shadow-md">
-                <i class="fa-solid fa-users me-1"></i>Roster & Lineup
-            </button>
-            <button id="tab-btn-talentid" onclick="switchTab('talentid')" class="tab-btn px-3.5 py-2 rounded-lg transition-all text-slate-400 hover:text-white">
-                <i class="fa-solid fa-gem me-1"></i>Talent ID & Mining
+            <button id="tab-btn-squad" onclick="switchTab('squad')" class="tab-btn px-3.5 py-2 rounded-lg transition-all bg-amber-500 text-slate-950 shadow-md">
+                <i class="fa-solid fa-users me-1"></i>FIFA Lineup Engine
             </button>
             <button id="tab-btn-matches" onclick="switchTab('matches')" class="tab-btn px-3.5 py-2 rounded-lg transition-all text-slate-400 hover:text-white">
-                <i class="fa-solid fa-clipboard-list me-1"></i>Pro Game Analysis
+                <i class="fa-solid fa-trophy me-1"></i>Keys to Victory & Game Analysis
+            </button>
+            <button id="tab-btn-talentid" onclick="switchTab('talentid')" class="tab-btn px-3.5 py-2 rounded-lg transition-all text-slate-400 hover:text-white">
+                <i class="fa-solid fa-gem me-1"></i>Market Talent ID
             </button>
         </nav>
     </header>
 
     <main class="flex-grow p-4 lg:p-6 max-w-[1750px] mx-auto w-full space-y-6 relative z-10">
 
-        <!-- MANAGER & TEAM DNA PROFILE BANNER -->
+        <!-- CLUB OVERVIEW BANNER -->
         <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
             <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-4 border-b border-slate-800/80 pb-4">
-                
-                <!-- TEAM CREST & TITLE -->
                 <div class="flex items-center space-x-4">
-                    <img id="team-logo-img" src="https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_logo.svg" class="w-14 h-14 object-contain p-1 bg-obsidian rounded-xl border border-slate-800" alt="Team Crest">
+                    <div id="team-logo-avatar" class="w-12 h-12 rounded-xl bg-obsidian border border-slate-800 flex items-center justify-center text-amber-400 text-2xl font-black">
+                        <i class="fa-solid fa-shield-cat"></i>
+                    </div>
                     <div>
                         <h2 id="team-dna-title" class="text-xl font-tech font-bold text-white flex items-center gap-2">
-                            Brighton & Hove Albion <span class="kam-pill font-mono text-xs px-2 py-0.5 rounded-full font-bold">KAM 8.7 / 10</span>
+                            Brighton & Hove Albion <span class="badge-good font-mono text-xs px-2 py-0.5 rounded-full font-bold">KAM 8.7 / 10</span>
                         </h2>
-                        <p id="team-dna-tagline" class="text-xs font-mono text-roseSoft-light">Primary Identity: Data-Driven Undervalued Market Mining & High-Sale Model</p>
+                        <p id="team-dna-tagline" class="text-xs font-mono text-amber-400">Primary Identity: Data-Driven Market Mining & High-Efficiency Transition</p>
                     </div>
                 </div>
 
                 <!-- MANAGER CARD -->
-                <div class="flex items-center space-x-3 bg-obsidian p-2.5 rounded-xl border border-slate-800">
-                    <img id="manager-photo-img" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200" class="w-11 h-11 rounded-lg object-cover border border-roseSoft-border" alt="Manager Portrait">
+                <div class="flex items-center space-x-3 bg-obsidian p-2 rounded-xl border border-slate-800">
+                    <div class="w-10 h-10 rounded-lg bg-panel border border-slate-700 flex items-center justify-center text-amber-400 text-lg">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
                     <div class="text-xs font-mono">
                         <span id="manager-name" class="font-bold text-white block">Fabian Hürzeler</span>
-                        <span id="manager-style" class="text-slate-400 text-[10px]">High-Press Inverted System</span>
-                        <span id="manager-kam" class="text-emerald-400 text-[10px] block font-bold">Manager Rating: KAM 8.8</span>
+                        <span id="manager-style" class="text-slate-400 text-[10px]">Inverted Pressing System</span>
                     </div>
                 </div>
-
             </div>
 
-            <p id="team-dna-desc" class="text-xs text-slate-300 leading-relaxed font-sans">
-                Industry benchmark in algorithmic player recruitment. Mines secondary Scandinavian and South American leagues for under-indexed talent before scaling and selling at maximum market efficiency.
-            </p>
+            <!-- DYNAMIC COLOR-CODED KPI METRICS -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 pt-1">
+                <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Overall KAM Rating</span>
+                    <span id="kpi-kam-score" class="text-2xl font-tech font-black text-status-good">8.7</span>
+                </div>
+                <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Offensive Rating</span>
+                    <span id="kpi-val-xg" class="text-2xl font-tech font-black text-status-good">8.8 <span class="text-xs font-normal text-slate-400">(2.05 xG)</span></span>
+                </div>
+                <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Defensive Rating</span>
+                    <span id="kpi-val-def" class="text-2xl font-tech font-black text-status-caution">7.9 <span class="text-xs font-normal text-slate-400">(1.15 xGA)</span></span>
+                </div>
+                <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Squad Chemistry</span>
+                    <span id="kpi-val-chem" class="text-2xl font-tech font-black text-status-good">92%</span>
+                </div>
+                <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Transfer Headroom</span>
+                    <span id="kpi-val-budget" class="text-2xl font-tech font-black text-emerald-400">£65.0M</span>
+                </div>
+                <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Value Mining Ratio</span>
+                    <span class="text-2xl font-tech font-black text-amber-400">9.6 / 10</span>
+                </div>
+            </div>
         </div>
 
-        <!-- VISUAL METRICS & GOOD VS BAD GRAPHICS BANNER -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-            
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-roseSoft">
-                <p class="text-[10px] uppercase font-mono text-slate-400 font-bold tracking-wider">Overall Franchise KAM</p>
-                <div class="flex items-baseline space-x-2 mt-1">
-                    <h3 id="kpi-kam-score" class="text-3xl font-tech font-black text-roseSoft-light">8.7</h3>
-                    <span class="text-xs text-emerald-400 font-mono font-bold">Elite</span>
-                </div>
-                <!-- Visual Bar Indicator -->
-                <div class="w-full bg-slate-900 h-1.5 rounded-full mt-2 overflow-hidden border border-slate-800">
-                    <div id="bar-kam" class="bg-roseSoft-light h-full transition-all duration-500" style="width: 87%"></div>
-                </div>
-            </div>
-
-            <!-- OFFENSIVE PROCESS DIAGNOSTIC -->
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-slate-700">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-[10px] uppercase font-mono text-slate-400">Offensive xG Output</p>
-                        <h3 id="kpi-val-xg" class="text-2xl font-tech font-bold text-white mt-1">1.98 xG</h3>
-                    </div>
-                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><i class="fa-solid fa-arrow-up"></i> +0.32</span>
-                </div>
-                <div class="w-full bg-slate-900 h-1.5 rounded-full mt-2 overflow-hidden border border-slate-800">
-                    <div id="bar-xg" class="bg-emerald-400 h-full" style="width: 82%"></div>
-                </div>
-            </div>
-
-            <!-- EXPECTED WINS DIAGNOSTIC -->
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-slate-700">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-[10px] uppercase font-mono text-slate-400">Expected Wins (xPTS)</p>
-                        <h3 id="kpi-val-xpts" class="text-2xl font-tech font-bold text-white mt-1">68.2 xPTS</h3>
-                    </div>
-                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Top 5</span>
-                </div>
-                <div class="w-full bg-slate-900 h-1.5 rounded-full mt-2 overflow-hidden border border-slate-800">
-                    <div id="bar-xpts" class="bg-emerald-400 h-full" style="width: 78%"></div>
-                </div>
-            </div>
-
-            <!-- SYNERGY COMPLEMENTARITY -->
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-slate-700">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-[10px] uppercase font-mono text-slate-400">Tactical Synergy</p>
-                        <h3 id="kpi-val-synergy" class="text-2xl font-tech font-bold text-white mt-1">91.0%</h3>
-                    </div>
-                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-roseSoft-bg text-roseSoft-light border border-roseSoft-border">Optimal</span>
-                </div>
-                <div class="w-full bg-slate-900 h-1.5 rounded-full mt-2 overflow-hidden border border-slate-800">
-                    <div id="bar-synergy" class="bg-roseSoft-light h-full" style="width: 91%"></div>
-                </div>
-            </div>
-
-            <!-- PRESSING & DEFENSIVE VULNERABILITY GAUGE -->
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-slate-700">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-[10px] uppercase font-mono text-slate-400">Pressing (PPDA)</p>
-                        <h3 class="text-2xl font-tech font-bold text-white mt-1">7.9 PPDA</h3>
-                    </div>
-                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Aggressive</span>
-                </div>
-                <div class="w-full bg-slate-900 h-1.5 rounded-full mt-2 overflow-hidden border border-slate-800">
-                    <div class="bg-emerald-400 h-full" style="width: 88%"></div>
-                </div>
-            </div>
-
-            <!-- MARKET VALUE MINING EFFICIENCY -->
-            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-roseSoft">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-[10px] uppercase font-mono text-slate-400">Value Mining</p>
-                        <h3 class="text-2xl font-tech font-bold text-white mt-1">KAM 9.6</h3>
-                    </div>
-                    <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Top 1%</span>
-                </div>
-                <div class="w-full bg-slate-900 h-1.5 rounded-full mt-2 overflow-hidden border border-slate-800">
-                    <div class="bg-roseSoft-light h-full" style="width: 96%"></div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- TAB 1: LINEUP & ROTATIONS -->
+        <!-- TAB 1: FIFA LINEUP & SWAP ENGINE -->
         <section id="tab-content-squad" class="tab-content space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
-                <div class="lg:col-span-7 space-y-6">
+                <div class="lg:col-span-8 space-y-6">
                     <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-4">
                             <div>
                                 <h2 class="text-lg font-tech font-bold text-white flex items-center gap-2">
-                                    <i class="fa-solid fa-sliders text-roseSoft-light"></i> Roster & Fantasy Rotation Engine
+                                    <i class="fa-solid fa-gamepad text-amber-400"></i> FIFA Pitch Lineup Engine
                                 </h2>
-                                <p class="text-xs text-slate-400">Click starters to inspect or swap with bench prospects to observe real-time KAM Rating adjustments.</p>
+                                <p class="text-xs text-slate-400">Tap a player on the pitch to select, then pick a bench player or market target to sub.</p>
                             </div>
 
                             <div class="flex items-center space-x-2 bg-obsidian p-1.5 rounded-xl border border-slate-800">
-                                <span class="text-xs font-mono text-slate-400 px-1">SYSTEM:</span>
-                                <select id="formation-select" onchange="changeFormation(this.value)" class="bg-panel text-roseSoft-light font-mono font-bold text-xs p-1.5 rounded-lg border border-slate-800 focus:outline-none">
+                                <span class="text-xs font-mono text-slate-400 px-1">FORMATION:</span>
+                                <select id="formation-select" onchange="changeFormation(this.value)" class="bg-panel text-amber-400 font-mono font-bold text-xs p-1.5 rounded-lg border border-slate-800 focus:outline-none">
                                     <option value="4-3-3">4-3-3 Attacking</option>
                                     <option value="4-2-3-1">4-2-3-1 Balanced</option>
                                     <option value="3-5-2">3-5-2 Wing-Backs</option>
@@ -246,75 +178,82 @@
                             </div>
                         </div>
 
-                        <div id="tactical-surface" class="relative pitch-soccer border border-roseSoft-border rounded-2xl p-6 min-h-[480px] flex flex-col justify-between overflow-hidden shadow-2xl">
+                        <!-- PITCH SURFACE -->
+                        <div id="tactical-surface" class="relative pitch-soccer border border-slate-800 rounded-2xl p-6 min-h-[560px] flex flex-col justify-between overflow-hidden shadow-2xl">
+                            <div id="sub-banner-alert" class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-20 bg-emerald-500 text-slate-950 font-mono font-bold text-xs px-4 py-1.5 rounded-full shadow-lg border border-emerald-300 animate-bounce">
+                                <i class="fa-solid fa-arrow-right-arrow-left me-1"></i> Substitution Executed!
+                            </div>
                             <div id="formation-slots-container" class="relative z-10 space-y-6 my-auto"></div>
                         </div>
 
+                        <!-- BENCH POOL -->
                         <div>
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                                <span><i class="fa-solid fa-couch text-roseSoft-light me-1"></i> Bench & Youth Prospects Pool</span>
-                                <span class="text-[10px] font-mono text-slate-500">Click starter then bench to swap</span>
+                                <span><i class="fa-solid fa-couch text-amber-400 me-1"></i> Reserve Bench Pool (Click to Sub)</span>
+                                <span class="text-[10px] font-mono text-slate-500">FIFA Swap Active</span>
                             </h3>
                             <div id="bench-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-5 space-y-6">
+                <div class="lg:col-span-4 space-y-6">
                     <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
                         <h3 class="text-base font-tech font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-chart-pie text-roseSoft-light"></i> Roster Trait Spectrum
+                            <i class="fa-solid fa-chart-pie text-amber-400"></i> Trait Radar Spectrum
                         </h3>
-                        <div class="relative h-64 w-full flex items-center justify-center">
+                        <div class="relative h-60 w-full flex items-center justify-center">
                             <canvas id="squadRadarChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- PLAYER BIO, GOOD VS BAD ATTRIBUTE BREAKDOWN -->
+                    <!-- INSPECTED PLAYER CARD -->
                     <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
                         <h3 class="text-sm font-bold text-white flex items-center justify-between">
-                            <span><i class="fa-solid fa-user-gear text-roseSoft-light me-2"></i>Executive Player Scout Brief</span>
-                            <span id="inspected-kam-pill" class="px-2 py-0.5 rounded kam-pill font-mono font-bold text-xs">KAM 8.9</span>
+                            <span><i class="fa-solid fa-id-card text-amber-400 me-2"></i>Selected Player Scout Card</span>
+                            <span id="inspected-kam-pill" class="px-2 py-0.5 rounded badge-good font-mono font-bold text-xs">KAM 8.9</span>
                         </h3>
                         <div id="active-player-profile-box" class="p-4 bg-obsidian rounded-xl border border-slate-800 text-xs text-slate-300 font-mono space-y-3">
-                            Click any player on the pitch or bench to inspect full season metrics, player photos, good vs bad trait diagnostics, and individual KAM Ratings.
+                            Click any player on the pitch or bench to inspect stats, position ratings, and substitution options.
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- TAB 2: TALENT ID & VALUE MINING -->
-        <section id="tab-content-talentid" class="tab-content space-y-6 hidden">
+        <!-- TAB 2: KEYS TO VICTORY & GAME ANALYSIS -->
+        <section id="tab-content-matches" class="tab-content space-y-6 hidden">
             <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
                 
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-800 pb-4">
                     <div>
                         <h2 class="text-lg font-tech font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-gem text-roseSoft-light"></i> Brighton & Bristol Style Talent ID Engine
+                            <i class="fa-solid fa-trophy text-amber-400"></i> Match Evaluation & Tactical Breakdown
                         </h2>
-                        <p class="text-xs text-slate-400">Algorithmic mining of undervalued prospects with elite metric-to-cost conversion ratios.</p>
+                        <p class="text-xs text-slate-400">Professional analysis featuring Keys to Victory, 3-Phase Evaluation, and Heatmap Overlays.</p>
                     </div>
-                    <span class="px-3 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold">
-                        100% Market Inefficiency Filter Active
-                    </span>
+
+                    <select id="match-fixture-select" onchange="renderMatchReview(this.value)" class="bg-obsidian text-white font-mono text-xs p-2 rounded-lg border border-slate-800 focus:border-amber-500">
+                        <option value="m1">Brighton 2 - 1 Arsenal (Matchday 28)</option>
+                        <option value="m2">Manchester City 1 - 1 Real Madrid (UCL Quarterfinal)</option>
+                    </select>
                 </div>
 
-                <div id="talent-id-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <!-- DYNAMIC MATCH REVIEW DISPLAY -->
+                <div id="match-review-display" class="space-y-6"></div>
             </div>
         </section>
 
-        <!-- TAB 3: PRO MATCH ANALYSIS -->
-        <section id="tab-content-matches" class="tab-content space-y-6 hidden">
+        <!-- TAB 3: MARKET TALENT ID -->
+        <section id="tab-content-talentid" class="tab-content space-y-6 hidden">
             <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                    <h2 class="text-lg font-tech font-bold text-white"><i class="fa-solid fa-clipboard-list text-roseSoft-light me-2"></i>Pro Match Analysis & Process Reviews</h2>
-                    <select id="match-fixture-select" onchange="renderMatchReview(this.value)" class="bg-obsidian text-white font-mono text-xs p-2 rounded-lg border border-slate-800">
-                        <option value="m1">Brighton 2 - 1 Arsenal (KAM Match Rating 8.8)</option>
-                        <option value="m2">Bristol City 3 - 0 Leicester (KAM Match Rating 8.2)</option>
-                    </select>
+                <div>
+                    <h2 class="text-lg font-tech font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-gem text-amber-400"></i> Undervalued Market Talent ID Engine
+                    </h2>
+                    <p class="text-xs text-slate-400">Algorithmic scouting recommendations based on metric suitability and transfer value ratios.</p>
                 </div>
-                <div id="match-review-display" class="space-y-6"></div>
+                <div id="talent-id-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
         </section>
 
@@ -324,93 +263,127 @@
         const TEAMS_DATABASE = {
             BHA: {
                 name: 'Brighton & Hove Albion',
-                tagline: 'Primary Identity: Data-Driven Undervalued Market Mining & High-Sale Model',
-                logo: 'https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_logo.svg',
+                tagline: 'Primary Identity: Data-Driven Market Mining & High-Efficiency Transition',
+                avatarIcon: 'fa-shield-cat',
                 managerName: 'Fabian Hürzeler',
-                managerStyle: 'High-Press Inverted System',
-                managerKam: '8.8',
-                managerPhoto: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200',
-                desc: 'Industry benchmark in algorithmic player recruitment. Mines secondary Scandinavian and South American leagues for under-indexed talent before scaling and selling at maximum market efficiency.',
-                overallKam: '8.7', xg: '1.98', xpts: '68.2', synergy: '91.0%'
+                managerStyle: 'Inverted High-Press System',
+                overallKam: '8.7', xg: '2.05', defRating: '7.9', chemistry: '92%', budget: '£65.0M'
             },
             ARS: {
                 name: 'Arsenal FC',
-                tagline: 'Primary Identity: Elite Out-of-Possession Rest-Defense & Set-Piece Dominance',
-                logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg',
+                tagline: 'Primary Identity: Out-of-Possession Rest-Defense & Set-Piece Dominance',
+                avatarIcon: 'fa-shield-halved',
                 managerName: 'Mikel Arteta',
                 managerStyle: 'Positional Structure & Rest Defense',
-                managerKam: '9.2',
-                managerPhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
-                desc: 'Combines structural positional play with relentless counter-pressing. High squad valuation with disciplined wage structure.',
-                overallKam: '8.9', xg: '2.18', xpts: '86.4', synergy: '94.2%'
-            },
-            BRC: {
-                name: 'Bristol City FC',
-                tagline: 'Primary Identity: High-Athletic Transition & Domestic Prospect Scaling',
-                logo: 'https://upload.wikimedia.org/wikipedia/en/f/f5/Bristol_City_FC.svg',
-                managerName: 'Liam Manning',
-                managerStyle: 'Direct Transition & Athletic Press',
-                managerKam: '8.1',
-                managerPhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
-                desc: 'Specializes in identifying high-intensity athletic profiles across EFL League One setups. Rapid transition focus with strong wage control.',
-                overallKam: '7.8', xg: '1.45', xpts: '54.0', synergy: '84.0%'
+                overallKam: '8.9', xg: '2.18', defRating: '9.1', chemistry: '95%', budget: '£120.0M'
             },
             MCI: {
                 name: 'Manchester City',
-                tagline: 'Primary Identity: Positional Overloads & Total Spatial Dominance',
-                logo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg',
+                tagline: 'Primary Identity: Positional Overloads & Total Spatial Control',
+                avatarIcon: 'fa-crown',
                 managerName: 'Pep Guardiola',
                 managerStyle: 'Total Possession & Spatial Overload',
-                managerKam: '9.8',
-                managerPhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200',
-                desc: 'Sustained territorial control backed by elite financial muscle. High technical requirements across all 11 positions on the pitch.',
-                overallKam: '9.4', xg: '2.45', xpts: '92.0', synergy: '96.5%'
+                overallKam: '9.4', xg: '2.45', defRating: '8.8', chemistry: '96%', budget: '£180.0M'
+            },
+            MUN: {
+                name: 'Manchester United',
+                tagline: 'Primary Identity: High-Speed Direct Counter Attack & Transition',
+                avatarIcon: 'fa-fire',
+                managerName: 'Ruben Amorim',
+                managerStyle: '3-4-2-1 High-Tempo Wingbacks',
+                overallKam: '8.5', xg: '1.92', defRating: '7.8', chemistry: '88%', budget: '£90.0M'
+            },
+            RMA: {
+                name: 'Real Madrid',
+                tagline: 'Primary Identity: Dynamic Individual Brilliance & Transition Lethality',
+                avatarIcon: 'fa-star',
+                managerName: 'Carlo Ancelotti',
+                managerStyle: 'Adaptive Fluid Structure',
+                overallKam: '9.5', xg: '2.50', defRating: '9.0', chemistry: '97%', budget: '£150.0M'
+            },
+            BAR: {
+                name: 'FC Barcelona',
+                tagline: 'Primary Identity: High Defensive Line Pressing & Academy Integration',
+                avatarIcon: 'fa-bolt',
+                managerName: 'Hansi Flick',
+                managerStyle: 'High Vertical Press & Possession',
+                overallKam: '9.1', xg: '2.30', defRating: '8.4', chemistry: '93%', budget: '£45.0M'
             }
         };
 
+        // ROSTER POOL FOR TEAMS
         let rosterData = {
             BHA: [
-                { id: 'b1', name: 'Kaoru Mitoma', pos: 'LW', age: 27, role: 'Starter', photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150', arch: 'Isolating Dribble Threat', kam: '8.9', bio: 'Elite 1v1 isolation winger. High conversion on progressive carries.', strengths: ['1v1 Take-Ons', 'Acceleration'], weaknesses: ['Aerial Duels'], xg: 7.2, xa: 6.8, sca: 98, salary: '£80k/wk', radar: [94, 88, 85, 52, 88, 80] },
-                { id: 'b2', name: 'Carlos Baleba', pos: 'DM', age: 20, role: 'Starter', photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150', arch: 'Press-Resistant Destroyer', kam: '8.8', bio: 'Massive physical engine. High tackle volume under pressure.', strengths: ['Press Resistance', 'Tackling'], weaknesses: ['Long Range Shots'], xg: 1.8, xa: 2.1, sca: 42, salary: '£35k/wk', radar: [75, 95, 82, 92, 70, 94] },
-                { id: 'b3', name: 'Jan Paul van Hecke', pos: 'CB', age: 24, role: 'Starter', photo: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=150', arch: 'Line-Breaking Center-Back', kam: '8.6', bio: 'Calm under pressure. Ranks in 92nd percentile for progressive passes.', strengths: ['Pass Accuracy', 'Composure'], weaknesses: ['Sprinting Speed'], xg: 0.9, xa: 1.2, sca: 28, salary: '£40k/wk', radar: [60, 91, 88, 89, 50, 90] },
-                { id: 'b4', name: 'Evan Ferguson', pos: 'ST', age: 19, role: 'Starter', photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150', arch: 'Power Box Finisher', kam: '8.5', bio: 'High xG conversion inside 18-yard box. Excellent hold-up play.', strengths: ['Shot Power', 'Heading'], weaknesses: ['Defensive Workrate'], xg: 8.4, xa: 2.0, sca: 52, salary: '£45k/wk', radar: [88, 78, 70, 60, 94, 78] },
-                { id: 'b5', name: 'Yasin Ayari', pos: 'CM', age: 20, role: 'Prospect', photo: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&q=80&w=150', arch: 'Versatile Tempo Controller', kam: '8.2', bio: 'High-energy Scandinavian import. Excellent ball retention.', strengths: ['Stamina', 'Short Passing'], weaknesses: ['Physical Strength'], xg: 2.4, xa: 3.1, sca: 38, salary: '£20k/wk', radar: [80, 86, 84, 74, 72, 85] }
+                { id: 'b1', name: 'Verbruggen', pos: 'GK', age: 22, role: 'Starter', icon: 'fa-user-shield', arch: 'Sweeper Keeper', kam: 8.4, status: 'good' },
+                { id: 'b2', name: 'Veltman', pos: 'RB', age: 32, role: 'Starter', icon: 'fa-user-group', arch: 'Defensive Fullback', kam: 8.1, status: 'caution' },
+                { id: 'b3', name: 'Dunk', pos: 'CB', age: 32, role: 'Starter', icon: 'fa-user-nurse', arch: 'Ball-Playing Leader', kam: 8.7, status: 'good' },
+                { id: 'b4', name: 'van Hecke', pos: 'CB', age: 24, role: 'Starter', icon: 'fa-user-check', arch: 'Line-Breaker CB', kam: 8.6, status: 'good' },
+                { id: 'b5', name: 'Estupiñán', pos: 'LB', age: 26, role: 'Starter', icon: 'fa-user-gear', arch: 'Attacking Wing-Back', kam: 8.5, status: 'good' },
+                { id: 'b6', name: 'Ayari', pos: 'DM', age: 20, role: 'Starter', icon: 'fa-user-lock', arch: 'Tempo Engine', kam: 8.3, status: 'good' },
+                { id: 'b7', name: 'Hinshelwood', pos: 'CM', age: 19, role: 'Starter', icon: 'fa-user-clock', arch: 'Versatile Midfield', kam: 8.2, status: 'caution' },
+                { id: 'b8', name: 'Minteh', pos: 'RW', age: 20, role: 'Starter', icon: 'fa-user-bolt', arch: 'Pacy Winger', kam: 8.4, status: 'good' },
+                { id: 'b9', name: 'Rutter', pos: 'AM', age: 22, role: 'Starter', icon: 'fa-user-pen', arch: 'Creative Linkage', kam: 8.6, status: 'good' },
+                { id: 'b10', name: 'Mitoma', pos: 'LW', age: 27, role: 'Starter', icon: 'fa-user-ninja', arch: '1v1 Dribble Threat', kam: 8.9, status: 'good' },
+                { id: 'b11', name: 'Ferguson', pos: 'ST', age: 19, role: 'Starter', icon: 'fa-user-tag', arch: 'Box Finisher', kam: 8.5, status: 'good' },
+
+                { id: 'b12', name: 'Welbeck', pos: 'ST', age: 33, role: 'Bench', icon: 'fa-user', arch: 'Veteran Linkup', kam: 8.2, status: 'caution' },
+                { id: 'b13', name: 'Adingra', pos: 'LW', age: 22, role: 'Bench', icon: 'fa-user-astronaut', arch: 'Direct Runner', kam: 8.3, status: 'good' },
+                { id: 'b14', name: 'Gruda', pos: 'RW', age: 20, role: 'Bench', icon: 'fa-user-graduate', arch: 'Technical Inverted', kam: 8.1, status: 'caution' }
             ]
         };
 
+        const MATCHES_DATABASE = {
+            m1: {
+                title: 'Brighton 2 - 1 Arsenal',
+                fixture: 'Premier League Matchday 28',
+                processXG: '2.05 vs 1.12',
+                possession: '54% - 46%',
+                
+                // KEYS TO VICTORY
+                keysToVictory: [
+                    { title: '1. Inverted Wing Isolation', desc: 'Mitoma isolated White on 7 separate 1v1 possessions, generating 1.14 xG from left-flank carries.' },
+                    { title: '2. Mid-Block Press Neutralization', desc: 'Baiting Arsenal’s high press allowed van Hecke to break lines directly into Rutter in central pockets.' },
+                    { title: '3. Rest-Defense Compression', desc: 'Denied central counter-attacks by holding a tight 3-2 rest-defense structure during transition phases.' }
+                ],
+
+                // 3-PHASE EVALUATION
+                phases: {
+                    defense: { score: '8.2 / 10', status: 'good', text: 'Structure held tight against high crosses, restricting Arsenal to low-probability perimeter shots.' },
+                    midfield: { score: '8.8 / 10', status: 'good', text: 'Central pairing dominated second-ball recoveries and maintained an 89% pass completion rate under pressure.' },
+                    attack: { score: '9.0 / 10', status: 'good', text: 'Clinical exploitation of half-spaces. Created 4 big chances with rapid vertical combinations.' }
+                }
+            }
+        };
+
         const TALENT_ID_TARGETS = [
-            { id: 't1', name: 'Oscar Gloukh', photo: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=150', league: 'Austrian Bundesliga', age: 20, pos: 'CAM', arch: 'Inverted Playmaker', kamRating: '9.2', valueRatio: '9.8 / 10', costStr: '£12.5M Fee / £25k/wk', bio: 'Algorithmic candidate for Brighton model. Ranks 98th percentile in key passes and shot creation under pressure.' },
-            { id: 't2', name: 'Sondre Østrøm', photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=150', league: 'Eliteserien (Norway)', age: 19, pos: 'DM', arch: 'Press-Resistant Engine', kamRating: '8.9', valueRatio: '9.6 / 10', costStr: '£4.2M Fee / £12k/wk', bio: 'Classic Bristol / Brighton non-top-5 league target. High tackle efficiency and elite progressive carry metrics.' }
+            { id: 't1', name: 'Oscar Gloukh', icon: 'fa-user-secret', league: 'Austrian Bundesliga', age: 20, pos: 'CAM', arch: 'Inverted Playmaker', kamRating: '9.2', valueRatio: '9.8 / 10', costStr: '£12.5M Fee / £25k/wk', bio: 'Ranks 98th percentile in key passes and shot creation under pressure.' },
+            { id: 't2', name: 'Sondre Østrøm', icon: 'fa-user-shield', league: 'Eliteserien (Norway)', age: 19, pos: 'DM', arch: 'Press-Resistant Engine', kamRating: '8.9', valueRatio: '9.6 / 10', costStr: '£4.2M Fee / £12k/wk', bio: 'High tackle efficiency and elite progressive carry metrics.' }
         ];
 
         let activeTeam = 'BHA';
-        let selectedSwapId = null;
+        let selectedStarterId = null;
         let squadRadarChart = null;
-        let countdownSecs = 30;
 
         window.onload = function() {
             switchTeam('BHA');
-            renderTalentIDTargets();
             renderMatchReview('m1');
-            startAutoRefreshTimer();
+            renderTalentIDTargets();
         };
 
         function switchTeam(teamId) {
             activeTeam = teamId;
             const dna = TEAMS_DATABASE[teamId] || TEAMS_DATABASE['BHA'];
 
-            document.getElementById('team-logo-img').src = dna.logo;
-            document.getElementById('manager-photo-img').src = dna.managerPhoto;
+            document.getElementById('team-logo-avatar').innerHTML = `<i class="fa-solid ${dna.avatarIcon}"></i>`;
             document.getElementById('manager-name').innerText = dna.managerName;
             document.getElementById('manager-style').innerText = dna.managerStyle;
-            document.getElementById('manager-kam').innerText = `Manager Rating: KAM ${dna.managerKam}`;
-            document.getElementById('team-dna-title').innerHTML = `${dna.name} <span class="kam-pill font-mono text-xs px-2 py-0.5 rounded-full font-bold">KAM ${dna.overallKam} / 10</span>`;
+            document.getElementById('team-dna-title').innerHTML = `${dna.name} <span class="badge-good font-mono text-xs px-2 py-0.5 rounded-full font-bold">KAM ${dna.overallKam} / 10</span>`;
             document.getElementById('team-dna-tagline').innerText = dna.tagline;
-            document.getElementById('team-dna-desc').innerText = dna.desc;
             document.getElementById('kpi-kam-score').innerText = dna.overallKam;
             document.getElementById('kpi-val-xg').innerText = `${dna.xg} xG`;
-            document.getElementById('kpi-val-xpts').innerText = `${dna.xpts} xPTS`;
-            document.getElementById('kpi-val-synergy').innerText = dna.synergy;
+            document.getElementById('kpi-val-def').innerText = `${dna.defRating}`;
+            document.getElementById('kpi-val-chem').innerText = dna.chemistry;
+            document.getElementById('kpi-val-budget').innerText = dna.budget;
 
             renderFormationSlots();
             renderBenchContainer();
@@ -420,13 +393,13 @@
         function switchTab(tabKey) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-roseSoft', 'text-white');
+                btn.classList.remove('bg-amber-500', 'text-slate-950');
                 btn.classList.add('text-slate-400');
             });
 
             document.getElementById(`tab-content-${tabKey}`).classList.remove('hidden');
             const activeBtn = document.getElementById(`tab-btn-${tabKey}`);
-            activeBtn.classList.add('bg-roseSoft', 'text-white');
+            activeBtn.classList.add('bg-amber-500', 'text-slate-950');
             activeBtn.classList.remove('text-slate-400');
         }
 
@@ -440,29 +413,43 @@
             const squad = getActiveTeamRoster();
             const starters = squad.filter(p => p.role === 'Starter');
 
-            if (starters.length === 0) {
-                container.innerHTML = `<div class="text-center text-slate-500 font-mono text-xs py-10">No active starters loaded for this team.</div>`;
-                return;
-            }
+            const rows = [
+                { id: 'fw', posList: ['LW', 'ST', 'RW'] },
+                { id: 'mf', posList: ['AM', 'CM', 'DM'] },
+                { id: 'df', posList: ['LB', 'CB', 'CB', 'RB'] },
+                { id: 'gk', posList: ['GK'] }
+            ];
 
-            const rowDiv = document.createElement('div');
-            rowDiv.className = `grid grid-cols-${Math.min(starters.length, 3)} gap-4 max-w-2xl mx-auto`;
+            rows.forEach(r => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = `grid grid-cols-${r.posList.length} gap-3 max-w-3xl mx-auto`;
 
-            starters.forEach(p => {
-                const isSelected = selectedSwapId === p.id;
-                rowDiv.innerHTML += `
-                    <div onclick="handlePlayerClick('${p.id}')" class="glass-card p-3 rounded-xl border border-slate-800 text-center cursor-pointer hover:border-roseSoft transition ${isSelected ? 'selected-player' : ''}">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-mono font-bold text-roseSoft-light bg-obsidian px-1.5 py-0.5 rounded border border-slate-800">${p.pos}</span>
-                            <span class="text-[9px] font-mono text-emerald-400 font-bold">KAM ${p.kam}</span>
+                r.posList.forEach(posCode => {
+                    const player = starters.find(p => p.pos === posCode && !p.rendered);
+                    if (player) player.rendered = true;
+                    const p = player || starters[0];
+
+                    const isSelected = selectedStarterId === p.id;
+                    const badgeClass = p.kam >= 8.5 ? 'badge-good' : (p.kam >= 8.0 ? 'badge-caution' : 'badge-warning');
+
+                    rowDiv.innerHTML += `
+                        <div onclick="handleStarterClick('${p.id}')" class="glass-card p-2 rounded-xl border border-slate-800 text-center cursor-pointer hover:border-amber-400 transition ${isSelected ? 'fifa-card-selected' : ''}">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[9px] font-mono font-bold text-amber-400 bg-obsidian px-1 py-0.5 rounded border border-slate-800">${p.pos}</span>
+                                <span class="text-[9px] font-mono ${badgeClass} px-1 rounded font-bold">${p.kam}</span>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-obsidian border border-slate-700 flex items-center justify-center text-amber-400 text-sm mx-auto my-1">
+                                <i class="fa-solid ${p.icon || 'fa-user'}"></i>
+                            </div>
+                            <div class="font-bold text-white text-xs truncate">${p.name}</div>
+                            <div class="text-[9px] text-slate-400 font-mono truncate">${p.arch.split(' ')[0]}</div>
                         </div>
-                        <img src="${p.photo}" class="w-10 h-10 rounded-full mx-auto my-1 object-cover border border-slate-700" alt="${p.name}">
-                        <div class="font-bold text-white text-xs truncate">${p.name}</div>
-                        <div class="text-[10px] text-slate-400 font-mono">${p.salary}</div>
-                    </div>
-                `;
+                    `;
+                });
+                container.appendChild(rowDiv);
             });
-            container.appendChild(rowDiv);
+
+            starters.forEach(p => delete p.rendered);
         }
 
         function renderBenchContainer() {
@@ -471,91 +458,127 @@
             const squad = getActiveTeamRoster();
             const bench = squad.filter(p => p.role !== 'Starter');
 
-            if (bench.length === 0) {
-                container.innerHTML = `<div class="text-slate-500 font-mono text-xs col-span-3">No bench prospects in current pool.</div>`;
-                return;
-            }
-
             bench.forEach(p => {
-                const isSelected = selectedSwapId === p.id;
+                const badgeClass = p.kam >= 8.5 ? 'badge-good' : 'badge-caution';
                 container.innerHTML += `
-                    <div onclick="handlePlayerClick('${p.id}')" class="glass-card p-2 rounded-xl border border-slate-800 flex items-center justify-between text-xs cursor-pointer hover:border-roseSoft transition ${isSelected ? 'selected-player' : ''}">
+                    <div onclick="handleBenchClick('${p.id}')" class="glass-card p-2 rounded-xl border border-slate-800 flex items-center justify-between text-xs cursor-pointer hover:border-amber-400 transition">
                         <div class="flex items-center space-x-2">
-                            <img src="${p.photo}" class="w-8 h-8 rounded-full object-cover border border-slate-700" alt="${p.name}">
+                            <div class="w-7 h-7 rounded-full bg-obsidian border border-slate-700 flex items-center justify-center text-amber-400 text-xs">
+                                <i class="fa-solid ${p.icon || 'fa-user'}"></i>
+                            </div>
                             <div>
                                 <span class="font-bold text-white block truncate">${p.name}</span>
-                                <span class="text-[10px] text-slate-400 font-mono">${p.pos} • ${p.role}</span>
+                                <span class="text-[9px] text-slate-400 font-mono">${p.pos} • ${p.role}</span>
                             </div>
                         </div>
-                        <span class="font-bold text-roseSoft-light font-mono text-xs">KAM ${p.kam}</span>
+                        <span class="font-bold ${badgeClass} px-1.5 py-0.5 rounded font-mono text-xs">${p.kam}</span>
                     </div>
                 `;
             });
         }
 
-        function handlePlayerClick(id) {
+        function handleStarterClick(id) {
             const squad = getActiveTeamRoster();
             const player = squad.find(p => p.id === id);
             if (!player) return;
 
             inspectPlayerStats(player);
-
-            if (!selectedSwapId) {
-                selectedSwapId = id;
-            } else if (selectedSwapId === id) {
-                selectedSwapId = null;
-            } else {
-                const p1 = squad.find(p => p.id === selectedSwapId);
-                const p2 = squad.find(p => p.id === id);
-
-                if (p1 && p2) {
-                    const tempRole = p1.role;
-                    p1.role = p2.role;
-                    p2.role = tempRole;
-                }
-                selectedSwapId = null;
-            }
-
+            selectedStarterId = id;
             renderFormationSlots();
-            renderBenchContainer();
-            updateSquadRadar();
+        }
+
+        function handleBenchClick(benchId) {
+            const squad = getActiveTeamRoster();
+            const benchPlayer = squad.find(p => p.id === benchId);
+            inspectPlayerStats(benchPlayer);
+
+            if (selectedStarterId) {
+                const starterPlayer = squad.find(p => p.id === selectedStarterId);
+                if (starterPlayer && benchPlayer) {
+                    starterPlayer.role = 'Bench';
+                    benchPlayer.role = 'Starter';
+
+                    selectedStarterId = null;
+                    showSubAlert();
+                    renderFormationSlots();
+                    renderBenchContainer();
+                    updateSquadRadar();
+                }
+            }
+        }
+
+        function showSubAlert() {
+            const alert = document.getElementById('sub-banner-alert');
+            alert.classList.remove('hidden');
+            setTimeout(() => alert.classList.add('hidden'), 2500);
         }
 
         function inspectPlayerStats(p) {
+            const badgeClass = p.kam >= 8.5 ? 'badge-good' : 'badge-caution';
+            document.getElementById('inspected-kam-pill').className = `px-2 py-0.5 rounded font-mono font-bold text-xs ${badgeClass}`;
             document.getElementById('inspected-kam-pill').innerText = `KAM ${p.kam} / 10`;
+
             document.getElementById('active-player-profile-box').innerHTML = `
                 <div class="space-y-3">
                     <div class="flex items-center space-x-3">
-                        <img src="${p.photo}" class="w-12 h-12 rounded-xl object-cover border border-roseSoft-border" alt="${p.name}">
+                        <div class="w-10 h-10 rounded-xl bg-panel border border-slate-700 flex items-center justify-center text-amber-400 text-lg">
+                            <i class="fa-solid ${p.icon || 'fa-user'}"></i>
+                        </div>
                         <div>
                             <span class="text-white font-bold block text-sm">${p.name} (Age ${p.age})</span>
-                            <span class="text-roseSoft-light font-mono text-xs">${p.salary} | ${p.arch}</span>
+                            <span class="text-amber-400 font-mono text-xs">${p.arch}</span>
                         </div>
                     </div>
                     
-                    <p class="text-xs text-slate-300 font-sans leading-relaxed">${p.bio}</p>
+                    <div class="p-2 bg-panel rounded-lg border border-slate-800 text-slate-300 text-xs">
+                        FIFA Substitution Mode Active: Click any bench player to replace ${p.name} on the tactical board.
+                    </div>
+                </div>
+            `;
+        }
 
-                    <!-- GOOD VS BAD GRAPHICS -->
-                    <div class="grid grid-cols-2 gap-2 text-[10px] font-mono">
-                        <div class="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20 text-emerald-400">
-                            <span class="font-bold block text-[9px] uppercase"><i class="fa-solid fa-circle-check me-1"></i>PROS / STRENGTHS</span>
-                            ${(p.strengths || ['High Yield']).map(s => `<div>• ${s}</div>`).join('')}
+        function renderMatchReview(matchKey) {
+            const m = MATCHES_DATABASE[matchKey] || MATCHES_DATABASE['m1'];
+            document.getElementById('match-review-display').innerHTML = `
+                <!-- KEYS TO VICTORY SECTION -->
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h3 class="text-base font-tech font-bold text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-key"></i> Keys to Victory (3 Decisive Factors)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs pt-1">
+                        ${m.keysToVictory.map(k => `
+                            <div class="bg-obsidian p-3 rounded-xl border border-slate-800 space-y-1">
+                                <span class="font-bold text-white block">${k.title}</span>
+                                <p class="text-[11px] text-slate-400 leading-relaxed font-sans">${k.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- 3-PHASE DIAGNOSTIC (DEFENSE, MIDFIELD, ATTACK) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass-card p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-tech font-bold text-white text-sm"><i class="fa-solid fa-shield text-amber-400 me-1"></i> Defense Phase</span>
+                            <span class="px-2 py-0.5 rounded badge-${m.phases.defense.status} font-mono font-bold text-xs">${m.phases.defense.score}</span>
                         </div>
-                        <div class="bg-roseSoft-bg p-2 rounded-lg border border-roseSoft-border text-roseSoft-light">
-                            <span class="font-bold block text-[9px] uppercase"><i class="fa-solid fa-triangle-exclamation me-1"></i>CONS / LIMITS</span>
-                            ${(p.weaknesses || ['Slight Deficit']).map(w => `<div>• ${w}</div>`).join('')}
-                        </div>
+                        <p class="text-xs text-slate-400 font-sans leading-relaxed">${m.phases.defense.text}</p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2 text-center pt-1">
-                        <div class="bg-panel p-2 rounded border border-slate-800">
-                            <span class="text-slate-500 text-[9px] block uppercase">Expected Goals (xG)</span>
-                            <span class="text-white font-bold text-sm">${p.xg}</span>
+                    <div class="glass-card p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-tech font-bold text-white text-sm"><i class="fa-solid fa-atom text-amber-400 me-1"></i> Midfield Phase</span>
+                            <span class="px-2 py-0.5 rounded badge-${m.phases.midfield.status} font-mono font-bold text-xs">${m.phases.midfield.score}</span>
                         </div>
-                        <div class="bg-panel p-2 rounded border border-slate-800">
-                            <span class="text-slate-500 text-[9px] block uppercase">Shot Creation (SCA)</span>
-                            <span class="text-emerald-400 font-bold text-sm">${p.sca}</span>
+                        <p class="text-xs text-slate-400 font-sans leading-relaxed">${m.phases.midfield.text}</p>
+                    </div>
+
+                    <div class="glass-card p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-tech font-bold text-white text-sm"><i class="fa-solid fa-bullseye text-amber-400 me-1"></i> Attack Phase</span>
+                            <span class="px-2 py-0.5 rounded badge-${m.phases.attack.status} font-mono font-bold text-xs">${m.phases.attack.score}</span>
                         </div>
+                        <p class="text-xs text-slate-400 font-sans leading-relaxed">${m.phases.attack.text}</p>
                     </div>
                 </div>
             `;
@@ -570,13 +593,15 @@
                     <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3 relative overflow-hidden">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center space-x-3">
-                                <img src="${p.photo}" class="w-10 h-10 rounded-full object-cover border border-slate-700" alt="${p.name}">
+                                <div class="w-9 h-9 rounded-full bg-obsidian border border-slate-700 flex items-center justify-center text-amber-400 text-sm">
+                                    <i class="fa-solid ${p.icon}"></i>
+                                </div>
                                 <div>
                                     <h3 class="font-bold text-white text-sm">${p.name}</h3>
                                     <p class="text-[11px] text-slate-400 font-mono">${p.league} • ${p.pos}</p>
                                 </div>
                             </div>
-                            <span class="px-2 py-1 rounded bg-panel text-roseSoft-light font-mono font-bold text-xs border border-slate-800">KAM ${p.kamRating}</span>
+                            <span class="px-2 py-1 rounded badge-good font-mono font-bold text-xs border border-slate-800">KAM ${p.kamRating}</span>
                         </div>
 
                         <p class="text-xs text-slate-300 font-sans leading-relaxed">${p.bio}</p>
@@ -591,10 +616,6 @@
                                 <span class="text-emerald-400 font-black text-xs">${p.valueRatio}</span>
                             </div>
                         </div>
-
-                        <button class="w-full py-2 bg-roseSoft hover:bg-rose-600 text-white font-bold rounded-xl text-xs uppercase transition font-tech shadow">
-                            <i class="fa-solid fa-file-contract me-1"></i> Add To Watchlist
-                        </button>
                     </div>
                 `;
             });
@@ -606,17 +627,15 @@
             const ctx = document.getElementById('squadRadarChart').getContext('2d');
             if (squadRadarChart) squadRadarChart.destroy();
 
-            const avgData = starters.length > 0 ? starters[0].radar : [80, 85, 88, 82, 80, 84];
-
             squadRadarChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: ['Offense', 'Press Resist', 'Playmaking', 'Defense', 'Box Threat', 'Workrate'],
                     datasets: [{
                         label: `${activeTeam} Spectrum`,
-                        data: avgData,
-                        backgroundColor: 'rgba(225, 41, 72, 0.2)',
-                        borderColor: '#fb7185',
+                        data: [88, 85, 90, 82, 86, 88],
+                        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                        borderColor: '#f59e0b',
                         borderWidth: 2
                     }]
                 },
@@ -627,39 +646,6 @@
                     plugins: { legend: { display: false } }
                 }
             });
-        }
-
-        function renderMatchReview(matchKey) {
-            document.getElementById('match-review-display').innerHTML = `
-                <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
-                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                        <div>
-                            <h3 class="text-xl font-tech font-bold text-white">Brighton 2 - 1 Arsenal</h3>
-                            <p class="text-xs font-mono text-slate-400">Match Process Efficiency: KAM 8.8 / 10</p>
-                        </div>
-                        <span class="px-3 py-1 rounded kam-pill font-mono text-xs font-bold">PRO SCOUT REVIEW</span>
-                    </div>
-                    <p class="text-xs text-slate-300 leading-relaxed font-sans">
-                        Brighton’s build-up baiting drew Arsenal’s high press before breaking lines through Mitoma’s 1v1 carries. Process xG favors Brighton 1.98 to 1.12.
-                    </p>
-                </div>
-            `;
-        }
-
-        function startAutoRefreshTimer() {
-            setInterval(() => {
-                countdownSecs--;
-                if (countdownSecs <= 0) {
-                    countdownSecs = 30;
-                    triggerManualRefresh();
-                }
-                document.getElementById('refresh-timer').innerText = `${countdownSecs}s`;
-            }, 1000);
-        }
-
-        function triggerManualRefresh() {
-            countdownSecs = 30;
-            updateSquadRadar();
         }
     </script>
 </body>
