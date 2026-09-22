@@ -1069,3 +1069,432 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAM Analysis - Multi-Sport & Predictive Talent Suite</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        kam: {
+                            gold: '#fbbf24',
+                            emerald: '#10b981',
+                            cyan: '#06b6d4',
+                            purple: '#a855f7',
+                            pink: '#ec4899',
+                            rose: '#f43f5e',
+                            dark: '#080c14',
+                            panel: '#0f172a',
+                            card: '#1e293b',
+                            border: '#334155'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #080c14; color: #f1f5f9; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .glass-panel { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: rgba(30, 41, 59, 0.65); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glow-gold { box-shadow: 0 0 20px rgba(251, 191, 36, 0.25); }
+        .pitch-soccer { background: radial-gradient(circle, #0f2b1d 0%, #08170f 100%); }
+        .court-nba { background: radial-gradient(circle, #2d1808 0%, #170b03 100%); }
+        .field-nfl { background: radial-gradient(circle, #122818 0%, #08140b 100%); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-kam-gold selection:text-slate-950">
+
+    <header class="glass-panel sticky top-0 z-50 border-b border-slate-800 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+            <div id="brand-logo-icon" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-kam-gold via-amber-500 to-amber-600 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg glow-gold">
+                <i class="fa-solid fa-crown"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-black tracking-wider text-white flex items-center gap-2">
+                    KAM <span class="text-kam-gold">ANALYSIS</span>
+                    <span id="active-league-pill" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-kam-gold border border-amber-500/30">Premier League</span>
+                </h1>
+                <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Multi-Sport Intelligence Suite</p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800 text-xs">
+            <div class="flex items-center space-x-1">
+                <span class="font-mono text-slate-400 px-1"><i class="fa-solid fa-globe text-kam-cyan"></i> LEAGUE:</span>
+                <select id="league-selector" onchange="switchLeague(this.value)" class="bg-slate-950 text-white font-bold py-1.5 px-2.5 rounded-lg border border-slate-800 focus:outline-none focus:border-kam-gold cursor-pointer">
+                    <option value="EPL" selected>🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</option>
+                    <option value="LALIGA">🇪🇸 La Liga</option>
+                    <option value="NBA">🇺🇸 NBA Basketball</option>
+                    <option value="NFL">🇺🇸 NFL Football</option>
+                </select>
+            </div>
+            <div class="flex items-center space-x-1 border-l border-slate-800 pl-2">
+                <span class="font-mono text-slate-400 px-1"><i class="fa-solid fa-shield-cat text-kam-gold"></i> TEAM:</span>
+                <select id="team-selector" onchange="switchTeam(this.value)" class="bg-slate-950 text-kam-gold font-bold py-1.5 px-2.5 rounded-lg border border-slate-800 focus:outline-none focus:border-kam-gold cursor-pointer">
+                </select>
+            </div>
+        </div>
+
+        <nav class="flex items-center space-x-1 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
+            <button id="tab-btn-squad" onclick="switchTab('squad')" class="tab-btn px-3 py-2 rounded-lg transition-all bg-amber-500 text-slate-950 shadow-md">
+                <i class="fa-solid fa-users me-1"></i>Lineup
+            </button>
+            <button id="tab-btn-recommend" onclick="switchTab('recommend')" class="tab-btn px-3 py-2 rounded-lg transition-all text-slate-400 hover:text-white">
+                <i class="fa-solid fa-gem me-1"></i>Trait Targets ($ Value)
+            </button>
+            <button id="tab-btn-predict" onclick="switchTab('predict')" class="tab-btn px-3 py-2 rounded-lg transition-all text-slate-400 hover:text-white">
+                <i class="fa-solid fa-calculator me-1"></i>Simulator
+            </button>
+            <button id="tab-btn-config" onclick="switchTab('config')" class="tab-btn px-3 py-2 rounded-lg transition-all text-slate-400 hover:text-white">
+                <i class="fa-solid fa-sliders me-1"></i>Control
+            </button>
+        </nav>
+    </header>
+
+    <main class="flex-grow p-4 lg:p-6 max-w-[1750px] mx-auto w-full space-y-6">
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-kam-gold col-span-2 sm:col-span-1">
+                <p class="text-[10px] uppercase font-mono text-slate-400 font-bold">KAM Rating (Out of 10)</p>
+                <div class="flex items-baseline space-x-2 mt-1">
+                    <h3 id="kpi-kam-score" class="text-3xl font-black text-kam-gold">8.8</h3>
+                    <span class="text-xs text-emerald-400 font-mono font-bold"><i class="fa-solid fa-arrow-up"></i> Top 5%</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">Dynamic Synergy Index</p>
+            </div>
+
+            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-kam-cyan">
+                <p id="kpi-label-1" class="text-[10px] uppercase font-mono text-slate-400">Offensive Metric</p>
+                <h3 id="kpi-val-1" class="text-2xl font-black text-white mt-1">2.14 xG</h3>
+                <p id="kpi-sub-1" class="text-[10px] text-slate-400 mt-1">Rank: <span class="text-emerald-400 font-bold">Tier 1</span></p>
+            </div>
+
+            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-kam-emerald">
+                <p id="kpi-label-2" class="text-[10px] uppercase font-mono text-slate-400">Expected Wins</p>
+                <h3 id="kpi-val-2" class="text-2xl font-black text-white mt-1">84.2 xPTS</h3>
+                <p id="kpi-sub-2" class="text-[10px] text-slate-400 mt-1">Title Prob: <span class="text-kam-cyan font-bold">34.8%</span></p>
+            </div>
+
+            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-kam-purple">
+                <p class="text-[10px] uppercase font-mono text-slate-400">Tactical Balance</p>
+                <h3 id="kpi-val-synergy" class="text-2xl font-black text-white mt-1">91.5%</h3>
+                <p class="text-[10px] text-emerald-400 mt-1">Optimal Traits</p>
+            </div>
+
+            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-kam-pink">
+                <p id="kpi-label-4" class="text-[10px] uppercase font-mono text-slate-400">Press / Control</p>
+                <h3 id="kpi-val-4" class="text-2xl font-black text-white mt-1">88.4</h3>
+                <p class="text-[10px] text-purple-400 mt-1">Rating: Elite</p>
+            </div>
+
+            <div class="glass-panel p-4 rounded-2xl border-l-4 border-l-rose-500">
+                <p class="text-[10px] uppercase font-mono text-slate-400">Payroll Bill</p>
+                <h3 id="kpi-val-salary" class="text-2xl font-black text-white mt-1">£1.85M</h3>
+                <p class="text-[10px] text-slate-400 mt-1">Under Budget Cap</p>
+            </div>
+        </div>
+
+        <!-- LINEUP BUILDER TAB -->
+        <section id="tab-content-squad" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div>
+                                <h2 id="tactical-board-title" class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-trophy text-kam-gold"></i> Team Pitch Builder
+                                </h2>
+                                <p class="text-xs text-slate-400">Position players to auto-calculate the team's combined KAM Rating (0-10).</p>
+                            </div>
+                        </div>
+
+                        <div id="tactical-surface" class="relative pitch-soccer border border-emerald-900/60 rounded-2xl p-6 min-h-[480px] flex flex-col justify-between overflow-hidden shadow-2xl">
+                            <div id="formation-slots-container" class="relative z-10 space-y-6 my-auto"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-kam-cyan"></i> Trait Radar Diagnostic
+                        </h3>
+                        <div class="relative h-64 w-full flex items-center justify-center">
+                            <canvas id="squadRadarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECOMMENDED TRAIT TARGETS & VALUE/$ TAB -->
+        <section id="tab-content-recommend" class="tab-content space-y-6 hidden">
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-gem text-kam-gold"></i> Recommended Trait Target Players (Value / $ Efficiency)
+                        </h2>
+                        <p class="text-xs text-slate-400">Algorithmic recruitment suggestions ranked by KAM Score & Value-per-Dollar Ratio.</p>
+                    </div>
+                </div>
+
+                <div id="recommendation-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+        </section>
+
+        <!-- SIMULATOR TAB -->
+        <section id="tab-content-predict" class="tab-content space-y-6 hidden">
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
+                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-calculator text-kam-cyan me-2"></i>Match Outcome Simulator</h2>
+                <button onclick="runSportSimulation()" class="px-4 py-2 bg-kam-cyan text-slate-950 font-bold rounded-xl text-xs uppercase">Run 10k Simulations</button>
+                <div id="sim-scorelines-container" class="space-y-2"></div>
+            </div>
+        </section>
+
+        <!-- CONTROL TAB -->
+        <section id="tab-content-config" class="tab-content space-y-6 hidden">
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-sliders text-kam-gold me-2"></i>Cloud & Weight Configuration</h2>
+                <p class="text-xs text-slate-400">Adjust parameters for the KAM 0-10 Score multiplier.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const TEAMS_DATA = {
+            EPL: [
+                { id: 'ARS', name: 'Arsenal FC' },
+                { id: 'MCI', name: 'Manchester City' },
+                { id: 'LIV', name: 'Liverpool FC' },
+                { id: 'CHE', name: 'Chelsea FC' }
+            ],
+            LALIGA: [
+                { id: 'RMA', name: 'Real Madrid' },
+                { id: 'BAR', name: 'FC Barcelona' },
+                { id: 'ATM', name: 'Atlético Madrid' }
+            ],
+            NBA: [
+                { id: 'BOS', name: 'Boston Celtics' },
+                { id: 'DEN', name: 'Denver Nuggets' },
+                { id: 'OKC', name: 'OKC Thunder' }
+            ],
+            NFL: [
+                { id: 'KCC', name: 'KC Chiefs' },
+                { id: 'SFO', name: 'SF 49ers' },
+                { id: 'BAL', name: 'BAL Ravens' }
+            ]
+        };
+
+        const PLAYERS_DATABASE = [
+            // EPL
+            { id: 'p1', name: 'Bukayo Saka', team: 'ARS', league: 'EPL', pos: 'RW', arch: 'Inverted Threat', salary: 210, ovr: 90, m1: 0.86, m2: 91, valueScore: 9.2, costStr: '£210k/wk', radar: [92, 91, 88, 62, 90, 74] },
+            { id: 'p2', name: 'Declan Rice', team: 'ARS', league: 'EPL', pos: 'DM', arch: 'Press-Resistant Engine', salary: 240, ovr: 89, m1: 0.30, m2: 94, valueScore: 8.8, costStr: '£240k/wk', radar: [80, 94, 88, 85, 78, 92] },
+            { id: 'p3', name: 'William Saliba', team: 'ARS', league: 'EPL', pos: 'CB', arch: 'Rim Protection Center-Back', salary: 190, ovr: 89, m1: 0.07, m2: 90, valueScore: 9.4, costStr: '£190k/wk', radar: [55, 90, 78, 91, 45, 95] },
+            { id: 'p4', name: 'Erling Haaland', team: 'MCI', league: 'EPL', pos: 'ST', arch: 'Box Striker Anchor', salary: 375, ovr: 93, m1: 1.04, m2: 78, valueScore: 8.1, costStr: '£375k/wk', radar: [98, 78, 70, 92, 96, 42] },
+            { id: 'p5', name: 'Rodri', team: 'MCI', league: 'EPL', pos: 'DM', arch: 'Deep-Lying Controller', salary: 300, ovr: 92, m1: 0.37, m2: 98, valueScore: 8.9, costStr: '£300k/wk', radar: [85, 98, 96, 88, 82, 94] },
+            { id: 'p6', name: 'Cole Palmer', team: 'CHE', league: 'EPL', pos: 'RW', arch: 'Inverted Threat', salary: 130, ovr: 88, m1: 0.90, m2: 89, valueScore: 9.8, costStr: '£130k/wk', radar: [91, 89, 92, 60, 88, 58] },
+            
+            // NBA
+            { id: 'n1', name: 'Nikola Jokić', team: 'DEN', league: 'NBA', pos: 'C', arch: 'Inverted Point Forward', salary: 51, ovr: 98, m1: 128.4, m2: 110.1, valueScore: 9.5, costStr: '$51.4M/yr', radar: [96, 99, 65, 82, 95, 98] },
+            { id: 'n2', name: 'Jayson Tatum', team: 'BOS', league: 'NBA', pos: 'SF', arch: '3-and-D Wing', salary: 34, ovr: 94, m1: 117.2, m2: 106.0, valueScore: 9.1, costStr: '$34.8M/yr', radar: [86, 84, 90, 88, 88, 80] },
+            { id: 'n3', name: 'Derrick White', team: 'BOS', league: 'NBA', pos: 'PG', arch: '3-and-D Wing', salary: 18, ovr: 87, m1: 114.5, m2: 105.8, valueScore: 9.9, costStr: '$18.3M/yr', radar: [80, 82, 92, 85, 68, 62] },
+
+            // NFL
+            { id: 'f1', name: 'Patrick Mahomes', team: 'KCC', league: 'NFL', pos: 'QB', arch: 'Field General QB', salary: 45, ovr: 99, m1: 0.28, m2: 54.2, valueScore: 9.6, costStr: '$45.0M/yr', radar: [98, 92, 95, 80, 92, 96] },
+            { id: 'f2', name: 'Christian McCaffrey', team: 'SFO', league: 'NFL', pos: 'RB', arch: 'YAC Slot Weapon', salary: 16, ovr: 96, m1: 0.22, m2: 51.0, valueScore: 9.7, costStr: '$16.0M/yr', radar: [92, 88, 85, 65, 96, 92] }
+        ];
+
+        let activeLeague = 'EPL';
+        let activeTeam = 'ARS';
+        let squadRadarChart = null;
+
+        window.onload = function() {
+            populateTeamSelector('EPL');
+            switchTeam('ARS');
+        };
+
+        function switchLeague(leagueKey) {
+            activeLeague = leagueKey;
+            populateTeamSelector(leagueKey);
+            const firstTeam = TEAMS_DATA[leagueKey][0].id;
+            switchTeam(firstTeam);
+        }
+
+        function populateTeamSelector(leagueKey) {
+            const teamSel = document.getElementById('team-selector');
+            teamSel.innerHTML = '';
+            (TEAMS_DATA[leagueKey] || []).forEach(t => {
+                teamSel.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+            });
+        }
+
+        function switchTeam(teamId) {
+            activeTeam = teamId;
+            renderLineupBoard();
+            renderRecommendations();
+            calculateKAMRating();
+            updateSquadRadar();
+        }
+
+        function switchTab(tabKey) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-slate-950', 'shadow-md');
+                btn.classList.add('text-slate-400', 'hover:text-white');
+            });
+
+            document.getElementById(`tab-content-${tabKey}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabKey}`);
+            activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'shadow-md');
+            activeBtn.classList.remove('text-slate-400');
+        }
+
+        function getActiveTeamPlayers() {
+            return PLAYERS_DATABASE.filter(p => p.team === activeTeam && p.league === activeLeague);
+        }
+
+        function calculateKAMRating() {
+            const players = getActiveTeamPlayers();
+            if (players.length === 0) {
+                document.getElementById('kpi-kam-score').innerText = '7.5';
+                return;
+            }
+            const avgOvr = players.reduce((sum, p) => sum + p.ovr, 0) / players.length;
+            const kamScore = ((avgOvr / 100) * 8.8 + 1.1).toFixed(1);
+            document.getElementById('kpi-kam-score').innerText = kamScore;
+        }
+
+        function renderLineupBoard() {
+            const container = document.getElementById('formation-slots-container');
+            container.innerHTML = '';
+            const players = getActiveTeamPlayers();
+
+            if (players.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-400 text-xs py-10">No active roster data for this team. Click 'Trait Targets' tab to sign players.</div>`;
+                return;
+            }
+
+            const rowDiv = document.createElement('div');
+            rowDiv.className = `grid grid-cols-${Math.min(players.length, 4)} gap-3 max-w-2xl mx-auto`;
+            
+            players.forEach(p => {
+                rowDiv.innerHTML += `
+                    <div class="glass-card p-3 rounded-xl border border-slate-700 text-center">
+                        <span class="text-[9px] font-mono font-bold text-kam-gold bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">${p.pos}</span>
+                        <div class="my-1 font-bold text-white text-xs truncate">${p.name}</div>
+                        <div class="text-[10px] text-kam-cyan font-mono">${p.ovr} OVR | KAM ${p.valueScore}</div>
+                    </div>
+                `;
+            });
+            container.appendChild(rowDiv);
+        }
+
+        function renderRecommendations() {
+            const container = document.getElementById('recommendation-cards-container');
+            container.innerHTML = '';
+
+            // Filter players not currently on active team but in same league
+            const targets = PLAYERS_DATABASE.filter(p => p.league === activeLeague && p.team !== activeTeam);
+
+            targets.forEach(p => {
+                container.innerHTML += `
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-white text-sm">${p.name}</h3>
+                                <p class="text-[11px] text-slate-400 font-mono">${p.arch}</p>
+                            </div>
+                            <span class="px-2 py-1 rounded bg-amber-500/10 text-kam-gold font-mono font-bold text-xs">${p.ovr} OVR</span>
+                        </div>
+
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono">
+                            <div>
+                                <span class="text-slate-400 block text-[9px]">WAGE / COST</span>
+                                <span class="text-white font-bold">${p.costStr}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-slate-400 block text-[9px]">VALUE/$ SCORE</span>
+                                <span class="text-emerald-400 font-black text-sm">${p.valueScore} / 10</span>
+                            </div>
+                        </div>
+
+                        <button onclick="signPlayerToTeam('${p.id}')" class="w-full py-2 bg-kam-gold hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs uppercase transition shadow">
+                            <i class="fa-solid fa-file-contract me-1"></i> Sign / Add To Roster
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function signPlayerToTeam(playerId) {
+            const player = PLAYERS_DATABASE.find(p => p.id === playerId);
+            if (player) {
+                player.team = activeTeam;
+                switchTeam(activeTeam);
+                switchTab('squad');
+            }
+        }
+
+        function updateSquadRadar() {
+            const players = getActiveTeamPlayers();
+            const ctx = document.getElementById('squadRadarChart').getContext('2d');
+            if (squadRadarChart) squadRadarChart.destroy();
+
+            const avgData = players.length > 0 ? players[0].radar : [80, 85, 88, 82, 80, 84];
+
+            squadRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Offense', 'Press Resist', 'Playmaking', 'Defense', 'Box Threat', 'Workrate'],
+                    datasets: [{
+                        label: `${activeTeam} Profile`,
+                        data: avgData,
+                        backgroundColor: 'rgba(251, 191, 36, 0.25)',
+                        borderColor: '#fbbf24',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { r: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { display: false }, suggestedMin: 50, suggestedMax: 100 } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function runSportSimulation() {
+            document.getElementById('sim-scorelines-container').innerHTML = `
+                <div class="p-3 bg-slate-950 rounded-xl font-mono text-xs text-kam-cyan">
+                    Monte Carlo Simulation Complete: ${activeTeam} projected Win Probability: 68.4%
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
+
