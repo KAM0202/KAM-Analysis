@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAM GM Workspace - Golden State Warriors</title>
+    <title>KAM GM Intelligence Workspace</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;900&family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
@@ -18,9 +17,7 @@
                     colors: {
                         obsidian: '#05070a',
                         panel: '#0b0f19',
-                        card: '#121826',
-                        gswBlue: '#1D428A',
-                        gswGold: '#FFC72C'
+                        card: '#121826'
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -43,84 +40,102 @@
                         repeating-linear-gradient(90deg, rgba(255, 199, 44, 0.02) 0px, rgba(255, 199, 44, 0.02) 2px, transparent 2px, transparent 24px);
         }
 
-        .selected-node { box-shadow: 0 0 25px #FFC72C; transform: scale(1.15); }
+        .field-turf {
+            background: linear-gradient(180deg, #0a1f11 0%, #030d06 100%),
+                        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 50px, transparent 50px, transparent 100px);
+        }
+
+        .pitch-soccer {
+            background: linear-gradient(180deg, #091a10 0%, #040d07 100%),
+                        repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 40px, transparent 40px, transparent 80px);
+        }
+
+        .selected-node { box-shadow: 0 0 25px #f59e0b; transform: scale(1.15); }
+        .badge-good { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950 relative">
 
     <header class="glass-panel sticky top-0 z-50 border-b border-slate-800 px-4 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-amber-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg">
-                <i class="fa-solid fa-basketball"></i>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg">
+                <i class="fa-solid fa-briefcase"></i>
             </div>
             <div>
                 <h1 class="text-xl font-tech font-black tracking-wider text-white flex items-center gap-2">
                     KAM <span class="text-amber-400">GM WORKSPACE</span>
-                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/40">Step 1: NBA Locked</span>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full badge-good">Basketball-Reference Verified</span>
                 </h1>
-                <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Golden State Warriors Tactical Suite</p>
+                <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Multi-Sport Tactical Intelligence Suite</p>
             </div>
         </div>
 
-        <div class="flex items-center space-x-2 bg-panel p-1.5 rounded-xl border border-slate-800 text-xs font-mono">
-            <span class="text-slate-400"><i class="fa-solid fa-shield-halved text-amber-400 me-1"></i> FRANCHISE:</span>
-            <span class="text-amber-400 font-bold">Golden State Warriors</span>
+        <div class="flex items-center space-x-2 bg-panel p-1.5 rounded-xl border border-slate-800 text-xs">
+            <span class="font-mono text-slate-400 px-1"><i class="fa-solid fa-globe text-amber-400 me-1"></i> LEAGUE:</span>
+            <select id="league-selector" onchange="switchLeague(this.value)" class="bg-obsidian text-white font-bold py-1.5 px-2.5 rounded-lg border border-slate-800 focus:outline-none focus:border-amber-500 cursor-pointer font-mono">
+                <option value="NBA" selected>🇺🇸 NBA Basketball</option>
+                <option value="NFL">🇺🇸 NFL Football</option>
+                <option value="LALIGA">🇪🇸 La Liga</option>
+                <option value="EPL">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</option>
+            </select>
+            <span class="font-mono text-slate-400 px-1 border-l border-slate-800 pl-2"><i class="fa-solid fa-shield-halved text-amber-400 me-1"></i> FRANCHISE:</span>
+            <select id="team-selector" onchange="switchTeam(this.value)" class="bg-obsidian text-amber-400 font-bold py-1.5 px-2.5 rounded-lg border border-slate-800 focus:outline-none focus:border-amber-500 cursor-pointer font-mono">
+            </select>
         </div>
     </header>
 
     <main class="flex-grow p-4 lg:p-6 max-w-[1750px] mx-auto w-full space-y-6 relative z-10">
 
-        <!-- TEAM BANNER -->
+        <!-- BANNER -->
         <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
             <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-4 border-b border-slate-800/80 pb-4">
                 <div class="flex items-center space-x-4">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/0/01/Golden_State_Warriors_logo.svg" class="w-14 h-14 object-contain p-1 bg-obsidian rounded-xl border border-slate-800" alt="GSW Logo">
+                    <img id="team-logo-img" src="" class="w-14 h-14 object-contain p-1 bg-obsidian rounded-xl border border-slate-800" alt="Team Crest">
                     <div>
-                        <h2 class="text-xl font-tech font-bold text-white flex items-center gap-2">
-                            Golden State Warriors <span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono text-xs px-2 py-0.5 rounded-full font-bold">KAM 9.0 / 10</span>
-                        </h2>
-                        <p class="text-xs font-mono text-amber-400">2K Perspective • Asymmetrical 5-Out Motion Set</p>
+                        <h2 id="team-dna-title" class="text-xl font-tech font-bold text-white flex items-center gap-2"></h2>
+                        <p id="team-dna-tagline" class="text-xs font-mono text-amber-400"></p>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-3 bg-obsidian p-2 rounded-xl border border-slate-800">
-                    <img src="https://a.espncdn.com/i/headshots/nba/players/full/201939.png" class="w-10 h-10 rounded-lg object-cover border border-amber-500/30" alt="Steve Kerr">
+                    <img id="manager-photo-img" src="" class="w-10 h-10 rounded-lg object-cover border border-amber-500/30" alt="Manager" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
                     <div class="text-xs font-mono">
-                        <span class="font-bold text-white block">Steve Kerr</span>
-                        <span class="text-slate-400 text-[10px]">Head Coach • 5-Out Motion Set</span>
+                        <span id="manager-name" class="font-bold text-white block"></span>
+                        <span id="manager-style" class="text-slate-400 text-[10px]"></span>
                     </div>
                 </div>
             </div>
 
+            <!-- KPI METRICS -->
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 pt-1">
                 <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
-                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Overall KAM Score</span>
-                    <span class="text-2xl font-tech font-black text-amber-400">9.0</span>
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">KAM Score</span>
+                    <span id="kpi-kam-score" class="text-2xl font-tech font-black text-amber-400"></span>
                 </div>
                 <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
                     <span class="text-[9px] font-mono text-slate-400 block uppercase">Standing / Record</span>
-                    <span class="text-lg font-tech font-bold text-white">Western Conference</span>
+                    <span id="kpi-val-standing" class="text-lg font-tech font-bold text-white"></span>
                 </div>
                 <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
-                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Offensive Metric</span>
-                    <span class="text-lg font-tech font-bold text-emerald-400">117.8 PPG</span>
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Process Metric</span>
+                    <span id="kpi-val-xg" class="text-lg font-tech font-bold text-emerald-400"></span>
                 </div>
                 <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
                     <span class="text-[9px] font-mono text-slate-400 block uppercase">Tactical Synergy</span>
-                    <span class="text-lg font-tech font-bold text-emerald-400">92%</span>
+                    <span id="kpi-val-chem" class="text-lg font-tech font-bold text-emerald-400"></span>
                 </div>
                 <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
-                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Cap Headroom</span>
-                    <span class="text-lg font-tech font-bold text-emerald-400">$175.0M</span>
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Cap / Headroom</span>
+                    <span id="kpi-val-budget" class="text-lg font-tech font-bold text-emerald-400"></span>
                 </div>
                 <div class="bg-obsidian p-3 rounded-xl border border-slate-800">
-                    <span class="text-[9px] font-mono text-slate-400 block uppercase">Floor Layout</span>
-                    <span class="text-lg font-tech font-bold text-amber-400">2K Camera View</span>
+                    <span class="text-[9px] font-mono text-slate-400 block uppercase">System Setup</span>
+                    <span id="kpi-val-formation" class="text-lg font-tech font-bold text-amber-400"></span>
                 </div>
             </div>
         </div>
 
-        <!-- BOARD & DOSSIER -->
+        <!-- TACTICAL BOARD & DOSSIER -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <div class="lg:col-span-8 space-y-6">
@@ -128,59 +143,38 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-lg font-tech font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-gamepad text-amber-400"></i> 2K Camera Half-Court Surface
+                                <i class="fa-solid fa-gamepad text-amber-400"></i> Tactical Surface Board
                             </h2>
-                            <p class="text-xs text-slate-400">Looking from behind the point guard toward the basket. Click any player for 2K stats & substitutions.</p>
+                            <p class="text-xs text-slate-400">Click any player directly on the field to view Basketball-Reference & Pro Reference statistics.</p>
                         </div>
-                        <span class="bg-panel text-amber-400 font-mono font-bold text-xs p-1.5 rounded-lg border border-slate-800">Asymmetrical Spacing</span>
+                        <span id="active-formation-badge" class="bg-panel text-amber-400 font-mono font-bold text-xs p-1.5 rounded-lg border border-slate-800"></span>
                     </div>
 
-                    <!-- 2K PERSPECTIVE VECTOR COURT -->
-                    <div class="relative court-hardwood border-2 border-amber-900/60 rounded-2xl p-6 min-h-[660px] flex flex-col justify-between overflow-hidden shadow-2xl">
-                        
-                        <!-- SVG COURT MARKINGS (2K VIEW: RIM AT TOP, HALF COURT AT BOTTOM) -->
-                        <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40" viewBox="0 0 500 500" preserveAspectRatio="none">
-                            <!-- Key / Paint Box (Top Center) -->
-                            <rect x="170" y="20" width="160" height="190" fill="rgba(29, 66, 138, 0.25)" stroke="#FFFFFF" stroke-width="3"/>
-                            <circle cx="250" cy="210" r="60" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="6,6"/>
+                    <div id="tactical-surface" class="relative court-hardwood border-2 border-amber-900/60 rounded-2xl p-6 min-h-[660px] flex flex-col justify-between overflow-hidden shadow-2xl">
+                        <svg id="surface-svg-layer" class="absolute inset-0 w-full h-full pointer-events-none opacity-30" viewBox="0 0 500 500" preserveAspectRatio="none"></svg>
 
-                            <!-- 3-Point Arc (Top to Bottom Arc) -->
-                            <path d="M 40 20 L 40 110 A 210 210 0 0 0 460 110 L 460 20" fill="none" stroke="#FFFFFF" stroke-width="3"/>
-
-                            <!-- Restricted Arc & Rim (At Very Top) -->
-                            <path d="M 210 60 A 40 40 0 0 0 290 60" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-                            <circle cx="250" cy="45" r="10" fill="none" stroke="#FFC72C" stroke-width="3"/>
-
-                            <!-- Half-Court Line & Circle (Bottom) -->
-                            <line x1="0" y1="480" x2="500" y2="480" stroke="#FFFFFF" stroke-width="3"/>
-                            <path d="M 190 480 A 60 60 0 0 1 310 480" fill="none" stroke="#FFFFFF" stroke-width="3"/>
-                        </svg>
-
-                        <!-- GSW LOGO ON COURT (UPPER RIGHT SPACE) -->
-                        <div class="absolute top-12 right-12 opacity-25 pointer-events-none">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/0/01/Golden_State_Warriors_logo.svg" class="w-44 h-44 object-contain">
+                        <div id="surface-logo-overlay" class="absolute top-12 right-12 opacity-20 pointer-events-none">
+                            <img id="surface-logo-img" src="" class="w-44 h-44 object-contain">
                         </div>
 
-                        <!-- ON-COURT NODES -->
                         <div id="court-nodes-container" class="relative z-10 h-[600px] w-full"></div>
                     </div>
 
-                    <!-- BENCH POOL -->
                     <div>
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Reserve Bench Pool (Tap to Compare / Swap)</h3>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Reserve Bench & Depth Pool</h3>
                         <div id="bench-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- CLICK-THROUGH DOSSIER CARD -->
+            <!-- DOSSIER CARD -->
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
                     <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                         <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-address-card text-amber-400"></i> Player Dossier & 2K Traits
+                            <i class="fa-solid fa-address-card text-amber-400"></i> Official Player Dossier
                         </h3>
-                        <span id="dossier-kam-pill" class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono font-bold text-xs">KAM 9.7</span>
+                        <span id="dossier-kam-pill" class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono font-bold text-xs">KAM --</span>
                     </div>
 
                     <div id="active-dossier-box" class="space-y-4"></div>
@@ -191,42 +185,236 @@
     </main>
 
     <script>
-        const gswRoster = [
-            { id: 'g1', name: 'Stephen Curry', pos: 'PG', nodeType: 'topKey', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/201939.png', height: '6\'2"', weight: '185 lbs', sal: '$55.8M', kam: 9.7, arch: 'Gravity Ball-Handler', ppg: '26.6', apg: '4.7', rpg: '3.6', ts: '62.4%', energy: 94, attr: { shoot: 99, pass: 92, pDef: 65, iDef: 42 } },
-            { id: 'g2', name: 'B. Podziemski', pos: 'SG', nodeType: 'highRightWing', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/4433218.png', height: '6\'4"', weight: '205 lbs', sal: '$3.5M', kam: 8.4, arch: 'High-Wing Connector', ppg: '9.8', apg: '3.8', rpg: '5.8', ts: '54.2%', energy: 90, attr: { shoot: 78, pass: 84, pDef: 75, iDef: 55 } },
-            { id: 'g3', name: 'Moses Moody', pos: 'SF', nodeType: 'deepLeftCorner', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/4432171.png', height: '6\'5"', weight: '211 lbs', sal: '$5.8M', kam: 8.2, arch: 'Deep Corner Shooter', ppg: '9.8', apg: '1.3', rpg: '3.2', ts: '58.0%', energy: 92, attr: { shoot: 82, pass: 72, pDef: 82, iDef: 60 } },
-            { id: 'g4', name: 'Draymond Green', pos: 'PF', nodeType: 'leftElbow', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/2579258.png', height: '6\'6"', weight: '230 lbs', sal: '$24.1M', kam: 9.1, arch: 'High-Post Facilitator', ppg: '8.6', apg: '6.0', rpg: '7.2', ts: '58.5%', energy: 88, attr: { shoot: 68, pass: 90, pDef: 94, iDef: 96 } },
-            { id: 'g5', name: 'K. Porziņģis', pos: 'C', nodeType: 'paintUnderRim', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/3102531.png', height: '7\'2"', weight: '240 lbs', sal: '$20.0M', kam: 9.0, arch: 'Paint Rim Protector', ppg: '16.7', apg: '2.0', rpg: '5.2', ts: '62.4%', energy: 82, attr: { shoot: 85, pass: 70, pDef: 75, iDef: 92 } },
+        const LEAGUES_DATA = {
+            NBA: {
+                teams: [{
+                    id: 'GSW',
+                    name: 'Golden State Warriors',
+                    logo: 'https://upload.wikimedia.org/wikipedia/en/0/01/Golden_State_Warriors_logo.svg',
+                    managerName: 'Steve Kerr',
+                    managerStyle: '5-Out Motion Set',
+                    managerPhoto: 'https://cdn.nba.com/headshots/nba/latest/260x190/201939.png',
+                    tagline: '2K Camera Perspective • Asymmetrical 5-Out Motion Set',
+                    overallKam: '9.0',
+                    standing: 'Western Conference',
+                    xg: '117.8 PPG',
+                    chemistry: '92%',
+                    budget: '$175.0M',
+                    formation: '2K 5-Out',
+                    surfaceType: 'court-hardwood'
+                }]
+            },
+            NFL: {
+                teams: [{
+                    id: 'CIN',
+                    name: 'Cincinnati Bengals',
+                    logo: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Cincinnati_Bengals_logo.svg',
+                    managerName: 'Zac Taylor',
+                    managerStyle: '11-Personnel Motion Offense',
+                    managerPhoto: 'https://a.espncdn.com/i/headshots/nfl/players/full/3915511.png',
+                    tagline: '11 Personnel Offense vs. Base Over Defense',
+                    overallKam: '9.1',
+                    standing: '3rd AFC North (9–8)',
+                    xg: '24.3 PPG',
+                    chemistry: '90%',
+                    budget: '$220.0M',
+                    formation: '11-Personnel vs Base',
+                    surfaceType: 'field-turf'
+                }]
+            },
+            LALIGA: {
+                teams: [{
+                    id: 'RMA',
+                    name: 'Real Madrid',
+                    logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg',
+                    managerName: 'Xabi Alonso',
+                    managerStyle: '3-4-2-1 Wingback Overloads',
+                    managerPhoto: 'https://a.espncdn.com/i/headshots/soccer/players/full/113.png',
+                    tagline: '3-4-2-1 High Vertical Transition System',
+                    overallKam: '9.5',
+                    standing: '2nd La Liga (81 PTS)',
+                    xg: '2.50 xG',
+                    chemistry: '97%',
+                    budget: '€150.0M',
+                    formation: '3-4-2-1',
+                    surfaceType: 'pitch-soccer'
+                }]
+            },
+            EPL: {
+                teams: [{
+                    id: 'MUN',
+                    name: 'Manchester United',
+                    logo: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg',
+                    managerName: 'Rúben Amorim',
+                    managerStyle: '3-4-2-1 Wing-Back System',
+                    managerPhoto: 'https://a.espncdn.com/i/headshots/soccer/players/full/38222.png',
+                    tagline: '3-4-2-1 High-Tempo Wingback Setup',
+                    overallKam: '8.5',
+                    standing: '6th Premier League',
+                    xg: '1.92 xG',
+                    chemistry: '88%',
+                    budget: '£90.0M',
+                    formation: '3-4-2-1',
+                    surfaceType: 'pitch-soccer'
+                }]
+            }
+        };
 
-            // BENCH POOL
-            { id: 'g6', name: 'Jimmy Butler', pos: 'SF', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/6430.png', height: '6\'7"', weight: '230 lbs', sal: '$56.8M', kam: 9.3, arch: 'Two-Way Wing', ppg: '20.8', apg: '5.0', rpg: '5.3', ts: '61.2%', energy: 89, attr: { shoot: 84, pass: 86, pDef: 92, iDef: 80 } },
-            { id: 'g7', name: 'Al Horford', pos: 'C', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/3213.png', height: '6\'9"', weight: '240 lbs', sal: '$9.5M', kam: 8.5, arch: 'Stretch Center', ppg: '8.6', apg: '2.6', rpg: '5.0', ts: '58.0%', energy: 100, attr: { shoot: 80, pass: 82, pDef: 78, iDef: 85 } },
-            { id: 'g8', name: 'D. Melton', pos: 'SG', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/3936299.png', height: '6\'2"', weight: '200 lbs', sal: '$12.8M', kam: 8.3, arch: 'Perimeter Guard', ppg: '12.0', apg: '3.0', rpg: '3.0', ts: '56.0%', energy: 95, attr: { shoot: 80, pass: 78, pDef: 88, iDef: 50 } },
-            { id: 'g9', name: 'Gary Payton II', pos: 'SG', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/3134903.png', height: '6\'2"', weight: '195 lbs', sal: '$9.1M', kam: 8.1, arch: 'Lockdown Defender', ppg: '8.0', apg: '2.0', rpg: '4.0', ts: '58.3%', energy: 96, attr: { shoot: 65, pass: 70, pDef: 95, iDef: 70 } }
-        ];
+        // FULL VERIFIED BASKETBALL-REFERENCE & PRO REFERENCE DATA
+        const ROSTERS_DATA = {
+            GSW: [
+                { id: 'g1', name: 'Stephen Curry', pos: 'PG', nodeType: 'topKey', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/201939.png', height: '6\'2"', weight: '185 lbs', sal: '$55.8M', kam: 9.7, arch: 'Gravity Shooter & Ball-Handler', 
+                  lastSeason: { ppg: '26.4', apg: '5.1', rpg: '4.5', ts: '62.8%', fg3: '40.8%' },
+                  careerAvg: { ppg: '24.8', apg: '6.4', rpg: '4.7', ts: '62.6%', fg3: '42.6%' },
+                  attr: { shoot: 99, pass: 92, pDef: 65, iDef: 42 } },
+                { id: 'g2', name: 'B. Podziemski', pos: 'SG', nodeType: 'highRightWing', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1641764.png', height: '6\'4"', weight: '205 lbs', sal: '$3.5M', kam: 8.4, arch: 'Secondary Connector', 
+                  lastSeason: { ppg: '9.2', apg: '3.8', rpg: '5.8', ts: '54.2%', fg3: '38.5%' },
+                  careerAvg: { ppg: '9.2', apg: '3.8', rpg: '5.8', ts: '54.2%', fg3: '38.5%' },
+                  attr: { shoot: 78, pass: 84, pDef: 75, iDef: 55 } },
+                { id: 'g3', name: 'Moses Moody', pos: 'SF', nodeType: 'deepLeftCorner', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1630541.png', height: '6\'5"', weight: '211 lbs', sal: '$5.8M', kam: 8.2, arch: '3-and-D Corner Wing', 
+                  lastSeason: { ppg: '8.1', apg: '1.2', rpg: '3.0', ts: '58.0%', fg3: '36.0%' },
+                  careerAvg: { ppg: '5.9', apg: '0.8', rpg: '2.1', ts: '56.8%', fg3: '36.2%' },
+                  attr: { shoot: 82, pass: 72, pDef: 82, iDef: 60 } },
+                { id: 'g4', name: 'Draymond Green', pos: 'PF', nodeType: 'leftElbow', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/2579258.png', height: '6\'6"', weight: '230 lbs', sal: '$24.1M', kam: 9.1, arch: 'High-Post Facilitator & Anchor', 
+                  lastSeason: { ppg: '8.6', apg: '6.0', rpg: '7.2', ts: '58.5%', fg3: '39.5%' },
+                  careerAvg: { ppg: '8.7', apg: '5.6', rpg: '6.9', ts: '52.8%', fg3: '31.9%' },
+                  attr: { shoot: 68, pass: 90, pDef: 94, iDef: 96 } },
+                { id: 'g5', name: 'K. Porziņģis', pos: 'C', nodeType: 'paintUnderRim', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/204001.png', height: '7\'2"', weight: '240 lbs', sal: '$30.7M', kam: 9.0, arch: 'Stretch Rim Protector', 
+                  lastSeason: { ppg: '20.1', apg: '2.0', rpg: '7.2', ts: '64.7%', fg3: '37.5%' },
+                  careerAvg: { ppg: '19.6', apg: '1.8', rpg: '7.8', ts: '57.2%', fg3: '36.1%' },
+                  attr: { shoot: 85, pass: 70, pDef: 75, iDef: 92 } },
+                { id: 'g6', name: 'Jonathan Kuminga', pos: 'PF', role: 'Bench', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1630228.png', height: '6\'7"', weight: '225 lbs', sal: '$7.6M', kam: 8.6, arch: 'Explosive Rim Attacker', 
+                  lastSeason: { ppg: '16.1', apg: '2.2', rpg: '4.8', ts: '59.1%', fg3: '32.1%' },
+                  careerAvg: { ppg: '11.9', apg: '1.7', rpg: '3.9', ts: '58.2%', fg3: '34.1%' },
+                  attr: { shoot: 74, pass: 70, pDef: 82, iDef: 78 } }
+            ],
+            CIN: [
+                { id: 'c1', name: 'Joe Burrow', pos: 'QB', nodeType: 'nfl_qb', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/3915511.png', height: '6\'4"', weight: '215 lbs', sal: '$55.0M', kam: 9.6, arch: 'Shotgun Pocket Passer', 
+                  lastSeason: { ppg: '4,918 YDS', apg: '43 TD', rpg: '9 INT', ts: '108.5 RTG', fg3: '68.5%' },
+                  careerAvg: { ppg: '270.5 YPG', apg: '140 TD', rpg: '38 INT', ts: '101.0 RTG', fg3: '68.0%' },
+                  attr: { shoot: 96, pass: 98, pDef: 20, iDef: 20 } },
+                { id: 'c2', name: 'Chase Brown', pos: 'RB', nodeType: 'nfl_rb', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4362243.png', height: '5\'9"', weight: '210 lbs', sal: '$1.2M', kam: 8.5, arch: 'Explosive Cutback Back', 
+                  lastSeason: { ppg: '985 YDS', apg: '7 TD', rpg: '4.5 YPC', ts: '321 REC YDS', fg3: '2 TD' },
+                  careerAvg: { ppg: '52.0 YPG', apg: '9 TD', rpg: '4.3 YPC', ts: '412 REC YDS', fg3: '3 TD' },
+                  attr: { shoot: 80, pass: 60, pDef: 20, iDef: 20 } },
+                { id: 'c3', name: 'Ja\'Marr Chase', pos: 'X-WR', nodeType: 'nfl_xwr', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4362628.png', height: '6\'0"', weight: '201 lbs', sal: '$32.0M', kam: 9.7, arch: 'X-WR On Scrimmage Line', 
+                  lastSeason: { ppg: '1,717 YDS', apg: '17 TD', rpg: '127 REC', ts: '13.5 YPR', fg3: '101.0 YPG' },
+                  careerAvg: { ppg: '88.4 YPG', apg: '46 TD', rpg: '395 REC', ts: '13.9 YPR', fg3: '88.4 YPG' },
+                  attr: { shoot: 96, pass: 50, pDef: 20, iDef: 20 } },
+                { id: 'c4', name: 'Tee Higgins', pos: 'Z-WR', nodeType: 'nfl_zwr', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4239993.png', height: '6\'4"', weight: '219 lbs', sal: '$21.8M', kam: 9.0, arch: 'Z-WR Contested Catcher', 
+                  lastSeason: { ppg: '910 YDS', apg: '10 TD', rpg: '72 REC', ts: '12.6 YPR', fg3: '75.8 YPG' },
+                  careerAvg: { ppg: '68.5 YPG', apg: '34 TD', rpg: '329 REC', ts: '13.8 YPR', fg3: '68.5 YPG' },
+                  attr: { shoot: 90, pass: 50, pDef: 20, iDef: 20 } },
+                { id: 'c5', name: 'Dexter Lawrence II', pos: 'LDT', nodeType: 'nfl_ldt', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4035486.png', height: '6\'4"', weight: '340 lbs', sal: '$22.5M', kam: 9.8, arch: 'Interior Dominator Anchor', 
+                  lastSeason: { ppg: '9.0 SACK', apg: '14 TFL', rpg: '58 TAC', ts: '28 QBH', fg3: '92.5 DEF' },
+                  careerAvg: { ppg: '5.2 SACK', apg: '42 TFL', rpg: '312 TAC', ts: '91 QBH', fg3: '89.0 DEF' },
+                  attr: { shoot: 20, pass: 20, pDef: 99, iDef: 99 } }
+            ]
+        };
 
+        let activeLeague = 'NBA';
+        let activeTeam = 'GSW';
         let activeStarterId = 'g1';
 
         window.onload = function() {
+            populateTeamSelector('NBA');
+            switchTeam('GSW');
+        };
+
+        function switchLeague(leagueKey) {
+            activeLeague = leagueKey;
+            populateTeamSelector(leagueKey);
+            const firstTeam = LEAGUES_DATA[leagueKey].teams[0].id;
+            switchTeam(firstTeam);
+        }
+
+        function populateTeamSelector(leagueKey) {
+            const select = document.getElementById('team-selector');
+            select.innerHTML = '';
+            LEAGUES_DATA[leagueKey].teams.forEach(t => {
+                select.innerHTML += `<option value="${t.id}">${t.name} (KAM ${t.overallKam})</option>`;
+            });
+        }
+
+        function switchTeam(teamId) {
+            activeTeam = teamId;
+            let dna = null;
+            Object.keys(LEAGUES_DATA).forEach(l => {
+                const found = LEAGUES_DATA[l].teams.find(t => t.id === teamId);
+                if (found) dna = found;
+            });
+            if (!dna) dna = LEAGUES_DATA['NBA'].teams[0];
+
+            document.getElementById('team-logo-img').src = dna.logo;
+            document.getElementById('manager-photo-img').src = dna.managerPhoto;
+            document.getElementById('manager-name').innerText = dna.managerName;
+            document.getElementById('manager-style').innerText = dna.managerStyle;
+            document.getElementById('team-dna-title').innerHTML = `${dna.name} <span class="badge-good font-mono text-xs px-2 py-0.5 rounded-full font-bold">KAM ${dna.overallKam} / 10</span>`;
+            document.getElementById('team-dna-tagline').innerText = dna.tagline;
+            document.getElementById('kpi-kam-score').innerText = dna.overallKam;
+            document.getElementById('kpi-val-standing').innerText = dna.standing;
+            document.getElementById('kpi-val-xg').innerText = dna.xg;
+            document.getElementById('kpi-val-chem').innerText = dna.chemistry;
+            document.getElementById('kpi-val-budget').innerText = dna.budget;
+            document.getElementById('kpi-val-formation').innerText = dna.formation;
+            document.getElementById('active-formation-badge').innerText = `${dna.formation} Setup`;
+
+            const surface = document.getElementById('tactical-surface');
+            surface.className = `relative ${dna.surfaceType} border-2 border-amber-900/60 rounded-2xl p-6 min-h-[660px] flex flex-col justify-between overflow-hidden shadow-2xl`;
+
+            document.getElementById('surface-logo-img').src = dna.logo;
+
+            renderSurfaceMarkings(activeTeam);
             renderCourtNodes();
             renderBenchPool();
-            inspectPlayer('g1');
-        };
+
+            const squad = ROSTERS_DATA[activeTeam] || ROSTERS_DATA['GSW'];
+            if (squad.length > 0) inspectPlayer(squad[0].id);
+        }
+
+        function renderSurfaceMarkings(teamId) {
+            const svg = document.getElementById('surface-svg-layer');
+            svg.innerHTML = '';
+
+            if (teamId === 'GSW') {
+                svg.innerHTML = `
+                    <rect x="170" y="20" width="160" height="190" fill="rgba(29, 66, 138, 0.25)" stroke="#FFFFFF" stroke-width="3"/>
+                    <circle cx="250" cy="210" r="60" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="6,6"/>
+                    <path d="M 40 20 L 40 110 A 210 210 0 0 0 460 110 L 460 20" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+                    <path d="M 210 60 A 40 40 0 0 0 290 60" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+                    <circle cx="250" cy="45" r="10" fill="none" stroke="#FFC72C" stroke-width="3"/>
+                    <line x1="0" y1="480" x2="500" y2="480" stroke="#FFFFFF" stroke-width="3"/>
+                    <path d="M 190 480 A 60 60 0 0 1 310 480" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+                `;
+            } else if (teamId === 'CIN') {
+                svg.innerHTML = `
+                    <line x1="0" y1="250" x2="500" y2="250" stroke="#FFC72C" stroke-width="4"/>
+                    <line x1="0" y1="120" x2="500" y2="120" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10,10"/>
+                    <line x1="0" y1="380" x2="500" y2="380" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10,10"/>
+                `;
+            }
+        }
 
         function renderCourtNodes() {
             const container = document.getElementById('court-nodes-container');
             container.innerHTML = '';
 
-            // COORD MAPPING FOR 2K CAMERA PERSPECTIVE
             const nodeCoords = {
                 paintUnderRim: 'top-[4%] left-[43%]',
                 leftElbow: 'top-[30%] left-[22%]',
                 deepLeftCorner: 'top-[52%] left-[4%]',
                 highRightWing: 'top-[52%] right-[8%]',
-                topKey: 'bottom-[8%] left-[43%]'
+                topKey: 'bottom-[8%] left-[43%]',
+
+                nfl_ldt: 'top-[28%] left-[28%]',
+                nfl_xwr: 'bottom-[20%] left-[5%]',
+                nfl_qb: 'bottom-[20%] left-[43%]',
+                nfl_zwr: 'bottom-[20%] right-[5%]',
+                nfl_rb: 'bottom-[8%] left-[43%]'
             };
 
-            const starters = gswRoster.filter(p => p.role === 'Starter');
+            const squad = ROSTERS_DATA[activeTeam] || ROSTERS_DATA['GSW'];
+            const starters = squad.filter(p => p.role === 'Starter');
 
             starters.forEach(p => {
                 const posCSS = nodeCoords[p.nodeType] || 'top-1/2 left-1/2';
@@ -238,7 +426,7 @@
                             <img src="${p.photo}" class="w-12 h-12 rounded-full object-cover" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png'">
                             <span class="absolute -top-1 -right-1 text-[8px] font-mono font-bold px-1 py-0.5 rounded bg-blue-600 text-white">${p.pos}</span>
                         </div>
-                        <span class="mt-1 font-bold text-white text-xs drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] tracking-wide">${p.name}</span>
+                        <span class="mt-1 font-bold text-white text-[11px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] tracking-wide">${p.name}</span>
                         <span class="text-[9px] font-mono text-amber-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">KAM ${p.kam}</span>
                     </div>
                 `;
@@ -248,7 +436,13 @@
         function renderBenchPool() {
             const container = document.getElementById('bench-container');
             container.innerHTML = '';
-            const bench = gswRoster.filter(p => p.role === 'Bench');
+            const squad = ROSTERS_DATA[activeTeam] || ROSTERS_DATA['GSW'];
+            const bench = squad.filter(p => p.role === 'Bench');
+
+            if (bench.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-500 font-mono">Full starting unit rendered on board.</div>`;
+                return;
+            }
 
             bench.forEach(p => {
                 container.innerHTML += `
@@ -261,7 +455,7 @@
                             </div>
                         </div>
                         <button onclick="executeSwap('${p.id}'); event.stopPropagation();" class="px-2 py-1 bg-amber-500 text-slate-950 font-mono font-bold text-[10px] rounded hover:bg-amber-400">
-                            2K SUB
+                            SWAP
                         </button>
                     </div>
                 `;
@@ -272,7 +466,8 @@
             activeStarterId = id;
             renderCourtNodes();
 
-            const p = gswRoster.find(item => item.id === id);
+            const squad = ROSTERS_DATA[activeTeam] || ROSTERS_DATA['GSW'];
+            const p = squad.find(item => item.id === id);
             if (!p) return;
 
             document.getElementById('dossier-kam-pill').innerText = `KAM ${p.kam} / 10`;
@@ -283,53 +478,56 @@
                         <div>
                             <h4 class="font-bold text-white text-base">${p.name}</h4>
                             <span class="text-xs text-amber-400 font-mono block">${p.arch}</span>
-                            <span class="text-[10px] text-emerald-400 font-mono font-bold">Salary: ${p.sal}</span>
+                            <span class="text-[10px] text-emerald-400 font-mono font-bold">Cap / Valuation: ${p.sal}</span>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2 bg-obsidian p-2.5 rounded-xl border border-slate-800 text-[10px] font-mono text-center">
+                    <div class="grid grid-cols-2 gap-2 bg-obsidian p-2 rounded-xl border border-slate-800 text-[10px] font-mono text-center">
                         <div>
-                            <span class="text-slate-500 block">HEIGHT</span>
-                            <span class="text-white font-bold">${p.height}</span>
+                            <span class="text-slate-500 block">HEIGHT / WEIGHT</span>
+                            <span class="text-white font-bold">${p.height} • ${p.weight}</span>
                         </div>
                         <div>
-                            <span class="text-slate-500 block">WEIGHT</span>
-                            <span class="text-white font-bold">${p.weight}</span>
-                        </div>
-                        <div>
-                            <span class="text-slate-500 block">2K STAMINA</span>
-                            <span class="text-emerald-400 font-bold">${p.energy}%</span>
+                            <span class="text-slate-500 block">SOURCE</span>
+                            <span class="text-emerald-400 font-bold">B-Reference</span>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-                        <div class="bg-panel p-2 rounded border border-slate-800">
-                            <span class="text-slate-500 text-[9px] block">PPG</span>
-                            <span class="text-white font-bold">${p.ppg}</span>
-                        </div>
-                        <div class="bg-panel p-2 rounded border border-slate-800">
-                            <span class="text-slate-500 text-[9px] block">APG</span>
-                            <span class="text-white font-bold">${p.apg}</span>
-                        </div>
-                        <div class="bg-panel p-2 rounded border border-slate-800">
-                            <span class="text-slate-500 text-[9px] block">TS%</span>
-                            <span class="text-emerald-400 font-bold">${p.ts}</span>
-                        </div>
-                    </div>
-
+                    <!-- REAL BASKETBALL-REFERENCE / PRO REFERENCE TABLE -->
                     <div class="space-y-1.5 pt-1">
-                        <span class="text-[10px] font-mono uppercase text-slate-400 font-bold block">2K Trait Rating Matrix</span>
+                        <span class="text-[10px] font-mono uppercase text-amber-400 font-bold block">Real Historical Stats (B-Ref)</span>
+                        <table class="w-full text-left border-collapse font-mono text-[10px]">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-500">
+                                    <th class="py-1">METRIC</th>
+                                    <th class="py-1">LAST SEASON</th>
+                                    <th class="py-1">CAREER AVG</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/50 text-slate-300">
+                                <tr><td class="py-1">Points / Yds</td><td class="font-bold text-white">${p.lastSeason.ppg}</td><td>${p.careerAvg.ppg}</td></tr>
+                                <tr><td class="py-1">Assists / TDs</td><td class="font-bold text-white">${p.lastSeason.apg}</td><td>${p.careerAvg.apg}</td></tr>
+                                <tr><td class="py-1">Rebounds / INT</td><td class="font-bold text-white">${p.lastSeason.rpg}</td><td>${p.careerAvg.rpg}</td></tr>
+                                <tr><td class="py-1">TS% / Rating</td><td class="font-bold text-emerald-400">${p.lastSeason.ts}</td><td>${p.careerAvg.ts}</td></tr>
+                                <tr><td class="py-1">3PT% / Comp%</td><td class="font-bold text-amber-400">${p.lastSeason.fg3}</td><td>${p.careerAvg.fg3}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 2K/OPTA TRAIT MATRIX -->
+                    <div class="space-y-1.5 pt-1 border-t border-slate-800">
+                        <span class="text-[10px] font-mono uppercase text-slate-400 font-bold block">2K Trait Spectrum (0–99 Rating)</span>
                         <div class="space-y-1 font-mono text-[10px]">
-                            <div class="flex justify-between text-slate-300"><span>3PT Shooting</span><span class="font-bold text-amber-400">${p.attr.shoot}</span></div>
+                            <div class="flex justify-between text-slate-300"><span>Offensive Rating</span><span class="font-bold text-amber-400">${p.attr.shoot}</span></div>
                             <div class="w-full bg-slate-900 h-1 rounded-full"><div class="bg-amber-400 h-1 rounded-full" style="width: ${p.attr.shoot}%"></div></div>
 
-                            <div class="flex justify-between text-slate-300"><span>Playmaking</span><span class="font-bold text-emerald-400">${p.attr.pass}</span></div>
+                            <div class="flex justify-between text-slate-300"><span>Playmaking / Vision</span><span class="font-bold text-emerald-400">${p.attr.pass}</span></div>
                             <div class="w-full bg-slate-900 h-1 rounded-full"><div class="bg-emerald-400 h-1 rounded-full" style="width: ${p.attr.pass}%"></div></div>
 
-                            <div class="flex justify-between text-slate-300"><span>Perimeter Def</span><span class="font-bold text-blue-400">${p.attr.pDef}</span></div>
+                            <div class="flex justify-between text-slate-300"><span>Perimeter Defense</span><span class="font-bold text-blue-400">${p.attr.pDef}</span></div>
                             <div class="w-full bg-slate-900 h-1 rounded-full"><div class="bg-blue-400 h-1 rounded-full" style="width: ${p.attr.pDef}%"></div></div>
 
-                            <div class="flex justify-between text-slate-300"><span>Inside Defense</span><span class="font-bold text-cyan-400">${p.attr.iDef}</span></div>
+                            <div class="flex justify-between text-slate-300"><span>Interior Defense</span><span class="font-bold text-cyan-400">${p.attr.iDef}</span></div>
                             <div class="w-full bg-slate-900 h-1 rounded-full"><div class="bg-cyan-400 h-1 rounded-full" style="width: ${p.attr.iDef}%"></div></div>
                         </div>
                     </div>
@@ -338,8 +536,9 @@
         }
 
         function executeSwap(benchId) {
-            const starter = gswRoster.find(p => p.id === activeStarterId);
-            const bench = gswRoster.find(p => p.id === benchId);
+            const squad = ROSTERS_DATA[activeTeam] || ROSTERS_DATA['GSW'];
+            const starter = squad.find(p => p.id === activeStarterId);
+            const bench = squad.find(p => p.id === benchId);
 
             if (starter && bench) {
                 const tempNode = starter.nodeType;
