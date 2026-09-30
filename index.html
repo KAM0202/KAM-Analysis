@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAM GM Intelligence Workspace</title>
     
-    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -39,6 +37,7 @@
     <style>
         body { background-color: #05070a; color: #f8fafc; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #05070a; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
@@ -53,6 +52,7 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--tw-colors-glassBorder, rgba(255,255,255,0.08)); 
         }
+        .glass-card { background: rgba(18, 24, 38, 0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.06); }
         .glass-dropdown {
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(16px);
@@ -85,7 +85,7 @@
         }
         .selected-node {
             box-shadow: 0 0 0 2px #f59e0b, 0 10px 30px rgba(245, 158, 11, 0.6);
-            transform: scale(1.1);
+            transform: scale(1.12);
         }
 
         /* Stat Bar Animation */
@@ -143,7 +143,7 @@
         .tooltip { transition: all 0.2s ease; }
         
         /* Node Swap Animation */
-        .node-swapping-out { transform: scale(0.5); opacity: 0; }
+        .node-swapping-out { transform: scale(0.5); opacity: 0; pointer-events: none; }
         .node-swapping-in { animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes popIn {
             0% { transform: scale(0.5); opacity: 0; }
@@ -162,12 +162,13 @@
             <div>
                 <h1 class="text-xl font-tech font-black tracking-wider text-white flex items-center gap-2">
                     KAM <span class="text-amber-400">WORKSPACE</span>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">v2.0 Active</span>
                 </h1>
                 <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Multi-Sport Tactical Suite</p>
             </div>
         </div>
 
-        <!-- Custom Dropdowns -->
+        <!-- Custom Glassmorphic Dropdowns -->
         <div class="flex items-center space-x-4">
             <!-- League Dropdown -->
             <div class="relative group" id="league-dropdown-container">
@@ -177,7 +178,7 @@
                         🇺🇸 NBA <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
                     </span>
                 </button>
-                <div id="league-dropdown" class="glass-dropdown absolute top-full mt-2 w-48 rounded-xl overflow-hidden opacity-0 invisible transform -translate-y-2 transition-all duration-300 z-50">
+                <div id="league-dropdown" class="glass-dropdown absolute top-full right-0 lg:left-0 mt-2 w-48 rounded-xl overflow-hidden opacity-0 invisible transform -translate-y-2 transition-all duration-300 z-50">
                     <ul class="py-1 text-sm font-medium text-slate-300">
                         <li><button onclick="selectLeague('NBA', '🇺🇸 NBA')" class="w-full text-left px-4 py-2 hover:bg-amber-500/20 hover:text-amber-400 transition-colors">🇺🇸 NBA Basketball</button></li>
                         <li><button onclick="selectLeague('NFL', '🇺🇸 NFL')" class="w-full text-left px-4 py-2 hover:bg-amber-500/20 hover:text-amber-400 transition-colors">🇺🇸 NFL Football</button></li>
@@ -192,7 +193,7 @@
                 <button onclick="toggleDropdown('team-dropdown')" class="flex items-center space-x-2 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700 rounded-lg px-3 py-1.5 transition-colors">
                     <span class="text-[10px] text-slate-400 font-mono uppercase">Team</span>
                     <span class="text-xs font-bold text-amber-400 flex items-center gap-2" id="selected-team-label">
-                        Golden State Warriors <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+                        Golden State <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
                     </span>
                 </button>
                 <div id="team-dropdown" class="glass-dropdown absolute top-full right-0 mt-2 w-64 rounded-xl overflow-hidden opacity-0 invisible transform -translate-y-2 transition-all duration-300 z-50">
@@ -203,8 +204,8 @@
             </div>
         </div>
 
-        <!-- Segmented Control -->
-        <div class="segmented-control font-mono">
+        <!-- Segmented Control View Toggle -->
+        <div class="segmented-control font-mono hidden md:inline-flex">
             <div class="segmented-pill" id="view-pill"></div>
             <button onclick="switchView('tactical')" id="btn-view-tactical" class="segmented-btn text-slate-950">
                 <i class="fa-solid fa-gamepad me-1"></i> Board
@@ -217,26 +218,64 @@
 
     <main class="flex-grow p-4 lg:p-6 max-w-[1800px] mx-auto w-full relative z-10 flex flex-col gap-6">
 
+        <!-- Team KPI Banner -->
+        <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
+            <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-4 border-b border-slate-800/80 pb-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 bg-obsidian rounded-xl border border-slate-800 p-1 flex items-center justify-center">
+                        <img id="kpi-logo" src="" class="max-w-full max-h-full object-contain filter drop-shadow-md">
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-tech font-bold text-white flex items-center gap-2" id="kpi-title">
+                            Team Name
+                        </h2>
+                        <p class="text-xs font-mono text-slate-400" id="kpi-subtitle">Style Description</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3 bg-obsidian/50 px-4 py-2 rounded-xl border border-slate-800/50">
+                    <div class="text-right text-xs font-mono">
+                        <span class="font-bold text-white block" id="kpi-manager-name">Manager Name</span>
+                        <span class="text-amber-400 text-[10px]" id="kpi-manager-role">Role</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 pt-1">
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
+                    <span class="text-[9px] font-mono text-slate-500 block uppercase">Overall KAM</span>
+                    <span class="text-xl font-tech font-black text-amber-400" id="stat-kam">--</span>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
+                    <span class="text-[9px] font-mono text-slate-500 block uppercase">Latest Standing</span>
+                    <span class="text-sm font-bold text-white" id="stat-standing">--</span>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
+                    <span class="text-[9px] font-mono text-slate-500 block uppercase">Offensive Metric</span>
+                    <span class="text-sm font-bold text-emerald-400" id="stat-metric">--</span>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
+                    <span class="text-[9px] font-mono text-slate-500 block uppercase">Tactical Synergy</span>
+                    <span class="text-sm font-bold text-blue-400" id="stat-chem">--</span>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
+                    <span class="text-[9px] font-mono text-slate-500 block uppercase">Valuation / Cap</span>
+                    <span class="text-sm font-bold text-white" id="stat-cap">--</span>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
+                    <span class="text-[9px] font-mono text-slate-500 block uppercase">Base System</span>
+                    <span class="text-sm font-bold text-amber-400" id="stat-system">--</span>
+                </div>
+            </div>
+        </div>
+
         <div id="view-tactical" class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow transition-opacity duration-300">
             
             <!-- Left: Tactical Board Container -->
             <div class="lg:col-span-8 flex flex-col relative" id="board-container">
                 
-                <!-- Custom Board Header -->
-                <div class="flex justify-between items-end mb-3 px-2">
-                    <div>
-                        <h2 class="text-xl font-tech font-bold text-white flex items-center gap-2" id="board-title">
-                            Golden State Warriors
-                        </h2>
-                        <p class="text-xs font-mono text-slate-400" id="board-subtitle">2K Camera Perspective • Asymmetrical 5-Out</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3 py-1 rounded-full font-mono text-xs font-bold shadow-sm" id="board-kam">KAM 9.0</span>
-                    </div>
-                </div>
-
                 <!-- Interactive Surface -->
-                <div class="relative court-hardwood border border-slate-800 rounded-2xl flex-grow min-h-[700px] overflow-hidden shadow-2xl flex flex-col" id="tactical-surface">
+                <div class="relative court-hardwood border border-slate-800 rounded-2xl flex-grow min-h-[650px] overflow-hidden shadow-2xl flex flex-col" id="tactical-surface">
                     
                     <!-- Base SVG Markings -->
                     <svg id="surface-svg-base" class="absolute inset-0 w-full h-full pointer-events-none opacity-40 transition-opacity duration-500" viewBox="0 0 500 500" preserveAspectRatio="none">
@@ -249,8 +288,8 @@
                     </svg>
 
                     <!-- Team Logo Overlay -->
-                    <div class="absolute top-12 right-12 opacity-15 pointer-events-none transition-all duration-700" id="surface-logo-overlay">
-                        <img id="surface-logo-img" src="" class="w-44 h-44 object-contain filter grayscale-[30%]">
+                    <div class="absolute opacity-15 pointer-events-none transition-all duration-700" id="surface-logo-overlay">
+                        <img id="surface-logo-img-board" src="" class="w-48 h-48 object-contain filter grayscale-[20%]">
                     </div>
 
                     <!-- Nodes Container -->
@@ -258,6 +297,7 @@
                         <!-- Populated by JS -->
                     </div>
 
+                    <!-- Floating Tactical Toolbox -->
                     <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 glass-panel px-4 py-2 rounded-2xl flex items-center space-x-3 z-40 shadow-2xl border border-slate-700">
                         <button onclick="toggleFullscreen()" class="tool-btn relative p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all">
                             <i class="fa-solid fa-expand"></i>
@@ -275,14 +315,14 @@
                         <div class="w-px h-5 bg-slate-700"></div>
                         <button onclick="resetLineup()" class="tool-btn relative p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all">
                             <i class="fa-solid fa-rotate-left"></i>
-                            <span class="tooltip absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-800 text-[9px] font-mono px-2 py-1 rounded opacity-0 pointer-events-none whitespace-nowrap text-white">Reset Subs</span>
+                            <span class="tooltip absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-slate-800 text-[9px] font-mono px-2 py-1 rounded opacity-0 pointer-events-none whitespace-nowrap text-white">Reset Lineup</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Bench List under board -->
                 <div class="mt-4 glass-panel p-4 rounded-2xl flex-shrink-0">
-                    <h3 class="text-[10px] font-bold text-slate-500 font-mono uppercase tracking-wider mb-3">Bench Options (Click to Swap)</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 font-mono uppercase tracking-wider mb-3">Reserve & Depth Pool (Click to Swap)</h3>
                     <div id="bench-container" class="flex overflow-x-auto space-x-3 pb-2 custom-scrollbar">
                         <!-- Populated by JS -->
                     </div>
@@ -292,21 +332,17 @@
             <div class="lg:col-span-4 flex flex-col h-full">
                 <div class="glass-panel rounded-2xl border border-slate-800 h-full flex flex-col overflow-hidden relative shadow-xl">
                     
-                    <!-- Dossier Header Image Background Effect -->
-                    <div id="dossier-bg-effect" class="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-amber-900/30 to-transparent pointer-events-none transition-colors duration-500"></div>
-
                     <div class="p-5 relative z-10 flex flex-col h-full">
                         <!-- Header / ID -->
-                        <div class="flex justify-between items-start mb-6">
+                        <div class="flex justify-between items-start mb-5">
                             <div class="flex space-x-4 items-center">
-                                <div class="relative w-20 h-20">
-                                    <img id="dossier-img" src="" class="w-20 h-20 rounded-2xl object-cover bg-obsidian border border-slate-700 shadow-[0_5px_15px_rgba(0,0,0,0.5)] z-10 relative">
-                                    <div class="absolute inset-0 rounded-2xl border-2 border-amber-500/50 transform translate-x-1 translate-y-1 z-0"></div>
+                                <div class="relative w-16 h-16">
+                                    <img id="dossier-img" src="" class="w-16 h-16 rounded-xl object-cover bg-obsidian border border-slate-700 shadow-lg z-10 relative">
                                 </div>
                                 <div>
-                                    <h3 id="dossier-name" class="text-xl font-bold text-white font-tech tracking-wide">Select Player</h3>
-                                    <p id="dossier-role" class="text-xs text-amber-400 font-mono mt-1">Position • Archetype</p>
-                                    <span id="dossier-badge" class="inline-block mt-2 px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-300 border border-slate-700">#00</span>
+                                    <h3 id="dossier-name" class="text-lg font-bold text-white tracking-wide">Select Player</h3>
+                                    <p id="dossier-role" class="text-[11px] text-amber-400 font-mono mt-0.5">Position • Archetype</p>
+                                    <span id="dossier-badge" class="inline-block mt-1.5 px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-white border border-slate-600">KAM --</span>
                                 </div>
                             </div>
                         </div>
@@ -315,11 +351,11 @@
                         <div class="flex border-b border-slate-800 mb-4 font-mono text-[10px] uppercase font-bold text-slate-500">
                             <button onclick="switchDossierTab('overview')" id="tab-btn-overview" class="pb-2 px-3 border-b-2 border-amber-500 text-amber-400 transition-colors">Overview</button>
                             <button onclick="switchDossierTab('stats')" id="tab-btn-stats" class="pb-2 px-3 border-b-2 border-transparent hover:text-slate-300 transition-colors">Real Stats</button>
-                            <button onclick="switchDossierTab('traits')" id="tab-btn-traits" class="pb-2 px-3 border-b-2 border-transparent hover:text-slate-300 transition-colors">2K / Opta Traits</button>
+                            <button onclick="switchDossierTab('traits')" id="tab-btn-traits" class="pb-2 px-3 border-b-2 border-transparent hover:text-slate-300 transition-colors">Tactical Matrix</button>
                         </div>
 
                         <!-- Tab Contents Container -->
-                        <div class="relative flex-grow overflow-hidden">
+                        <div class="relative flex-grow overflow-y-auto custom-scrollbar overflow-x-hidden">
                             
                             <!-- TAB 1: Overview -->
                             <div id="tab-overview" class="tab-content active space-y-4">
@@ -333,7 +369,7 @@
                                         <span id="dos-weight" class="text-sm font-bold text-white">--</span>
                                     </div>
                                     <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50">
-                                        <span class="text-[9px] text-slate-500 font-mono block">SALARY / VALUE</span>
+                                        <span class="text-[9px] text-slate-500 font-mono block">CONTRACT / VALUE</span>
                                         <span id="dos-sal" class="text-sm font-bold text-emerald-400">--</span>
                                     </div>
                                     <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800/50 flex flex-col justify-center">
@@ -346,14 +382,15 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-4 p-4 rounded-xl bg-gradient-to-br from-slate-800/40 to-transparent border border-slate-700/50">
-                                    <p class="text-xs text-slate-300 italic leading-relaxed">"Crucial to the tactical setup. Operates dynamically within the assigned system to exploit spatial advantages and mismatches."</p>
+                                <div class="mt-4 p-4 rounded-xl bg-slate-900/80 border border-slate-700/50">
+                                    <span class="text-[9px] font-mono text-amber-400 block uppercase mb-1"><i class="fa-solid fa-magnifying-glass me-1"></i> Scouting Report</span>
+                                    <p id="dos-scout" class="text-xs text-slate-300 italic leading-relaxed">Select a player to view qualitative tactical analysis.</p>
                                 </div>
                             </div>
 
                             <!-- TAB 2: Process Stats (Real Data) -->
-                            <div id="tab-stats" class="tab-content h-full flex flex-col">
-                                <p class="text-[9px] font-mono text-amber-400 mb-3"><i class="fa-solid fa-check-circle me-1"></i> B-Ref / Pro-Ref Verified Data</p>
+                            <div id="tab-stats" class="tab-content">
+                                <p class="text-[9px] font-mono text-emerald-400 mb-3"><i class="fa-solid fa-check-circle me-1"></i> Verified Last Season & Career Averages</p>
                                 <div class="bg-slate-900/50 rounded-xl border border-slate-800/50 overflow-hidden">
                                     <table class="w-full text-left font-mono text-[10px]">
                                         <thead class="bg-slate-800/80">
@@ -371,8 +408,8 @@
                             </div>
 
                             <!-- TAB 3: Traits -->
-                            <div id="tab-traits" class="tab-content h-full">
-                                <p class="text-[9px] font-mono text-slate-400 mb-4 uppercase">Tactical Skill Matrix (0-99)</p>
+                            <div id="tab-traits" class="tab-content h-full pb-4">
+                                <p class="text-[9px] font-mono text-slate-400 mb-4 uppercase">Tactical Skill Matrix (0-99 Rating)</p>
                                 <div class="space-y-4" id="dos-traits-container">
                                     <!-- Populated via JS -->
                                 </div>
@@ -384,7 +421,6 @@
             </div>
         </div>
 
-        <!-- Hidden Roster View -->
         <div id="view-roster" class="hidden glass-panel p-6 rounded-2xl border border-slate-800 min-h-[600px]">
             <h2 class="text-lg font-tech font-bold text-white mb-4">Complete Squad List</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="roster-grid-container">
@@ -408,114 +444,149 @@
                 id: 'GSW', name: 'Golden State Warriors', league: 'NBA',
                 logo: 'https://upload.wikimedia.org/wikipedia/en/0/01/Golden_State_Warriors_logo.svg',
                 manager: 'Steve Kerr', style: '2K Perspective • 5-Out Motion Set',
-                kam: '9.0', standing: '10th West (46-36)', metric: '117.8 PPG', chem: '92%', cap: '$175.0M',
-                surface: 'court-hardwood'
+                kam: '9.0', standing: 'West (25-26)', metric: '117.8 PPG', chem: '92%', cap: '$175.0M',
+                system: '5-Out Motion', surface: 'court-hardwood'
             },
             CIN: {
                 id: 'CIN', name: 'Cincinnati Bengals', league: 'NFL',
                 logo: 'https://upload.wikimedia.org/wikipedia/commons/8/81/Cincinnati_Bengals_logo.svg',
                 manager: 'Zac Taylor', style: '11 Personnel Offense vs Base',
-                kam: '9.1', standing: '3rd AFC North (9-8)', metric: '24.3 PPG', chem: '90%', cap: '$220.0M',
-                surface: 'field-turf'
+                kam: '9.1', standing: 'AFC North (25-26)', metric: '24.3 PPG', chem: '90%', cap: '$220.0M',
+                system: '11 Personnel', surface: 'field-turf'
             },
             RMA: {
                 id: 'RMA', name: 'Real Madrid', league: 'LALIGA',
                 logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg',
-                manager: 'Xabi Alonso', style: '3-4-2-1 High Vertical Transition',
-                kam: '9.5', standing: '2nd La Liga (81 PTS)', metric: '2.50 xG', chem: '97%', cap: '€150.0M',
-                surface: 'pitch-soccer'
+                manager: 'Carlo Ancelotti', style: '3-4-2-1 High Vertical Transition',
+                kam: '9.5', standing: 'La Liga (25-26)', metric: '2.50 xG', chem: '97%', cap: '€150.0M',
+                system: '3-4-2-1 Asym', surface: 'pitch-soccer'
             },
             MUN: {
                 id: 'MUN', name: 'Manchester United', league: 'EPL',
                 logo: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg',
                 manager: 'Rúben Amorim', style: '3-4-2-1 Wingback Setup',
-                kam: '8.5', standing: '6th Premier League', metric: '1.92 xG', chem: '88%', cap: '£90.0M',
-                surface: 'pitch-soccer'
+                kam: '8.5', standing: 'EPL (25-26)', metric: '1.92 xG', chem: '88%', cap: '£90.0M',
+                system: '3-4-2-1 Wingback', surface: 'pitch-soccer'
             }
         };
 
-        // Fully Formatted Roster Data across 4 Teams
+        // Deep Context 2025-2026 Data Load
         const ROSTERS = {
             GSW: [
-                { id: 'g1', num: '30', name: 'Stephen Curry', pos: 'PG', nodeType: 'topKey', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/201939.png', height: '6\'2"', weight: '185 lbs', sal: '$55.8M', kam: 9.7, arch: 'Gravity Shooter', energy: 94,
+                // Starters
+                { id: 'g1', num: '30', name: 'Stephen Curry', pos: 'PG', nodeType: 'topKey', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/201939.png', height: '6\'2"', weight: '185 lbs', sal: '$55.8M', kam: 9.7, arch: 'Gravity Shooter', energy: 92,
+                  scout: 'Generational off-ball gravity. Requires constant top-locking from opposing defenses. Elite TS% initiator but naturally declining defensive lateral quickness in isolation.',
                   stats: [ { label: 'Points (PPG)', last: '26.4', car: '24.8' }, { label: 'Assists (APG)', last: '5.1', car: '6.4' }, { label: 'Rebounds (RPG)', last: '4.5', car: '4.7' }, { label: 'True Shooting', last: '62.8%', car: '62.6%' } ],
                   traits: [ { label: '3PT Shooting', val: 99, color: 'bg-amber-400' }, { label: 'Playmaking', val: 92, color: 'bg-emerald-400' }, { label: 'Perimeter Def', val: 65, color: 'bg-blue-400' }, { label: 'Inside Def', val: 42, color: 'bg-cyan-400' } ] },
                 { id: 'g2', num: '2', name: 'B. Podziemski', pos: 'SG', nodeType: 'highRightWing', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1641764.png', height: '6\'4"', weight: '205 lbs', sal: '$3.5M', kam: 8.4, arch: 'High-Wing Connector', energy: 90,
-                  stats: [ { label: 'Points (PPG)', last: '9.2', car: '9.2' }, { label: 'Assists (APG)', last: '3.8', car: '3.8' }, { label: 'Rebounds (RPG)', last: '5.8', car: '5.8' }, { label: 'True Shooting', last: '54.2%', car: '54.2%' } ],
+                  scout: 'High-IQ connector who bridges the gap between Curry\'s gravity and the roll man. Elite rebounding for a guard, excellent secondary playmaker.',
+                  stats: [ { label: 'Points (PPG)', last: '9.2', car: '9.2' }, { label: 'Assists (APG)', last: '3.8', car: '3.8' }, { label: 'Rebounds (RPG)', last: '5.8', car: '5.8' }, { label: '3PT %', last: '38.5%', car: '38.5%' } ],
                   traits: [ { label: '3PT Shooting', val: 78, color: 'bg-amber-400' }, { label: 'Playmaking', val: 84, color: 'bg-emerald-400' }, { label: 'Perimeter Def', val: 75, color: 'bg-blue-400' }, { label: 'Inside Def', val: 55, color: 'bg-cyan-400' } ] },
-                { id: 'g3', num: '4', name: 'Moses Moody', pos: 'SF', nodeType: 'deepLeftCorner', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1630541.png', height: '6\'5"', weight: '211 lbs', sal: '$5.8M', kam: 8.2, arch: 'Deep Corner Shooter', energy: 92,
-                  stats: [ { label: 'Points (PPG)', last: '8.1', car: '5.9' }, { label: 'Rebounds (RPG)', last: '3.0', car: '2.1' }, { label: 'True Shooting', last: '58.0%', car: '56.8%' }, { label: '3PT %', last: '36.0%', car: '36.2%' } ],
-                  traits: [ { label: '3PT Shooting', val: 82, color: 'bg-amber-400' }, { label: 'Playmaking', val: 72, color: 'bg-emerald-400' }, { label: 'Perimeter Def', val: 82, color: 'bg-blue-400' }, { label: 'Inside Def', val: 60, color: 'bg-cyan-400' } ] },
-                { id: 'g4', num: '23', name: 'Draymond Green', pos: 'PF', nodeType: 'leftElbow', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/2579258.png', height: '6\'6"', weight: '230 lbs', sal: '$24.1M', kam: 9.1, arch: 'High-Post Facilitator', energy: 88,
+                { id: 'g3', num: '22', name: 'Andrew Wiggins', pos: 'SF', nodeType: 'deepLeftCorner', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/203952.png', height: '6\'7"', weight: '197 lbs', sal: '$26.2M', kam: 8.3, arch: 'Athletic Slasher', energy: 88,
+                  scout: 'Primary point-of-attack defender against elite wings. Offensively best utilized as a spot-up threat and back-door cutter in the motion offense.',
+                  stats: [ { label: 'Points (PPG)', last: '13.2', car: '18.5' }, { label: 'Rebounds (RPG)', last: '4.5', car: '4.5' }, { label: 'True Shooting', last: '54.3%', car: '54.5%' }, { label: '3PT %', last: '35.8%', car: '35.4%' } ],
+                  traits: [ { label: '3PT Shooting', val: 75, color: 'bg-amber-400' }, { label: 'Athleticism', val: 88, color: 'bg-emerald-400' }, { label: 'Perimeter Def', val: 86, color: 'bg-blue-400' }, { label: 'Inside Def', val: 70, color: 'bg-cyan-400' } ] },
+                { id: 'g4', num: '23', name: 'Draymond Green', pos: 'PF', nodeType: 'leftElbow', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/2579258.png', height: '6\'6"', weight: '230 lbs', sal: '$24.1M', kam: 9.1, arch: 'Defensive Anchor & Hub', energy: 85,
+                  scout: 'The tactical fulcrum of the offense. Operates from the high post to trigger split action. Unrivaled defensive IQ and helpside rotation timing.',
                   stats: [ { label: 'Points (PPG)', last: '8.6', car: '8.7' }, { label: 'Assists (APG)', last: '6.0', car: '5.6' }, { label: 'Rebounds (RPG)', last: '7.2', car: '6.9' }, { label: 'True Shooting', last: '58.5%', car: '52.8%' } ],
-                  traits: [ { label: '3PT Shooting', val: 68, color: 'bg-amber-400' }, { label: 'Playmaking', val: 90, color: 'bg-emerald-400' }, { label: 'Perimeter Def', val: 94, color: 'bg-blue-400' }, { label: 'Inside Def', val: 96, color: 'bg-cyan-400' } ] },
-                { id: 'g5', num: '8', name: 'K. Porziņģis', pos: 'C', nodeType: 'paintUnderRim', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/204001.png', height: '7\'2"', weight: '240 lbs', sal: '$30.7M', kam: 9.0, arch: 'Paint Rim Protector', energy: 82,
-                  stats: [ { label: 'Points (PPG)', last: '20.1', car: '19.6' }, { label: 'Rebounds (RPG)', last: '7.2', car: '7.8' }, { label: 'True Shooting', last: '64.7%', car: '57.2%' }, { label: 'Blocks (BPG)', last: '1.9', car: '1.8' } ],
-                  traits: [ { label: '3PT Shooting', val: 85, color: 'bg-amber-400' }, { label: 'Playmaking', val: 70, color: 'bg-emerald-400' }, { label: 'Perimeter Def', val: 75, color: 'bg-blue-400' }, { label: 'Inside Def', val: 92, color: 'bg-cyan-400' } ] },
+                  traits: [ { label: '3PT Shooting', val: 68, color: 'bg-amber-400' }, { label: 'Playmaking', val: 92, color: 'bg-emerald-400' }, { label: 'Perimeter Def', val: 94, color: 'bg-blue-400' }, { label: 'Inside Def', val: 96, color: 'bg-cyan-400' } ] },
+                { id: 'g5', num: '32', name: 'T. Jackson-Davis', pos: 'C', nodeType: 'paintUnderRim', role: 'Starter', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1631218.png', height: '6\'9"', weight: '245 lbs', sal: '$1.8M', kam: 8.2, arch: 'Rim Runner / Protector', energy: 89,
+                  scout: 'Vertical spacing threat who provides crucial rim protection. Excels in the dunker spot and running the floor. Developing short-roll reads.',
+                  stats: [ { label: 'Points (PPG)', last: '7.9', car: '7.9' }, { label: 'Rebounds (RPG)', last: '5.0', car: '5.0' }, { label: 'Blocks (BPG)', last: '1.1', car: '1.1' }, { label: 'FG %', last: '70.2%', car: '70.2%' } ],
+                  traits: [ { label: 'Interior Scoring', val: 85, color: 'bg-amber-400' }, { label: 'Rebounding', val: 82, color: 'bg-emerald-400' }, { label: 'Perimeter Def', val: 55, color: 'bg-blue-400' }, { label: 'Inside Def', val: 84, color: 'bg-cyan-400' } ] },
                 
-                { id: 'g6', num: '00', name: 'J. Kuminga', pos: 'PF', role: 'Bench', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1630228.png', height: '6\'7"', weight: '225 lbs', sal: '$7.6M', kam: 8.6, arch: 'Explosive Rim Attacker', energy: 95,
-                  stats: [ { label: 'Points (PPG)', last: '16.1', car: '11.9' }, { label: 'Rebounds', last: '4.8', car: '3.9' } ],
-                  traits: [ { label: 'Inside Finishing', val: 88, color: 'bg-amber-400' }, { label: 'Perimeter Def', val: 82, color: 'bg-blue-400' } ] },
-                { id: 'g7', num: '22', name: 'Jimmy Butler', pos: 'SF', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/nba/players/full/6430.png', height: '6\'7"', weight: '230 lbs', sal: '$56.8M', kam: 9.3, arch: 'Two-Way Wing', energy: 89,
-                  stats: [ { label: 'Points (PPG)', last: '20.8', car: '18.3' }, { label: 'Assists (APG)', last: '5.0', car: '4.2' } ],
-                  traits: [ { label: 'Midrange', val: 84, color: 'bg-amber-400' }, { label: 'Perimeter Def', val: 92, color: 'bg-blue-400' } ] }
+                // Bench
+                { id: 'g6', num: '00', name: 'J. Kuminga', pos: 'PF', role: 'Bench', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1630228.png', height: '6\'7"', weight: '225 lbs', sal: '$7.6M', kam: 8.6, arch: 'Explosive Scorer', energy: 95, scout: 'Elite downhill athlete. Capable of creating his own shot when the offense stalls. Defensive focus fluctuates but physical tools are elite.', stats: [ { label: 'Points', last: '16.1', car: '11.9' }, { label: 'TS%', last: '59.1%', car: '58.2%' } ], traits: [ { label: 'Slashing', val: 90, color: 'bg-amber-400' }, { label: 'Defense', val: 78, color: 'bg-blue-400' } ] },
+                { id: 'g7', num: '4', name: 'Moses Moody', pos: 'SG/SF', role: 'Bench', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1630541.png', height: '6\'5"', weight: '211 lbs', sal: '$5.8M', kam: 8.1, arch: '3-and-D Wing', energy: 92, scout: 'Reliable 3&D option. Needs to improve quick decision-making against closeouts.', stats: [ { label: 'Points', last: '8.1', car: '5.9' }, { label: '3PT%', last: '36.0%', car: '36.2%' } ], traits: [ { label: '3PT Shooting', val: 82, color: 'bg-amber-400' }, { label: 'Defense', val: 82, color: 'bg-blue-400' } ] },
+                { id: 'g8', num: '8', name: 'D. Melton', pos: 'PG', role: 'Bench', photo: 'https://cdn.nba.com/headshots/nba/latest/260x190/1629001.png', height: '6\'2"', weight: '200 lbs', sal: '$12.8M', kam: 8.3, arch: 'Two-Way Guard', energy: 90, scout: 'Excellent point-of-attack defender and capable spot-up shooter. Provides steady backup minutes for Curry.', stats: [ { label: 'Points', last: '11.1', car: '9.1' }, { label: 'Steals', last: '1.6', car: '1.4' } ], traits: [ { label: '3PT Shooting', val: 79, color: 'bg-amber-400' }, { label: 'Defense', val: 88, color: 'bg-blue-400' } ] }
             ],
             CIN: [
-                { id: 'c1', num: '9', name: 'Joe Burrow', pos: 'QB', nodeType: 'nfl_qb', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/3915511.png', height: '6\'4"', weight: '215 lbs', sal: '$55.0M', kam: 9.6, arch: 'Shotgun Pocket Passer', energy: 98,
-                  stats: [ { label: 'Passing Yds', last: '4,918', car: '270.5 YPG' }, { label: 'Pass TD', last: '43', car: '140' }, { label: 'Interceptions', last: '9', car: '38' }, { label: 'Passer Rating', last: '108.5', car: '101.0' } ],
-                  traits: [ { label: 'Throw Accuracy', val: 96, color: 'bg-amber-400' }, { label: 'Awareness', val: 98, color: 'bg-emerald-400' }, { label: 'Agility', val: 78, color: 'bg-blue-400' }, { label: 'Break Sack', val: 82, color: 'bg-cyan-400' } ] },
-                { id: 'c3', num: '1', name: 'Ja\'Marr Chase', pos: 'X-WR', nodeType: 'nfl_xwr', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4362628.png', height: '6\'0"', weight: '201 lbs', sal: '$32.0M', kam: 9.7, arch: 'X-WR Alpha Target', energy: 95,
-                  stats: [ { label: 'Rec Yards', last: '1,717', car: '88.4 YPG' }, { label: 'Rec TD', last: '17', car: '46' }, { label: 'Receptions', last: '127', car: '395' }, { label: 'Yards Per Rec', last: '13.5', car: '13.9' } ],
-                  traits: [ { label: 'Speed', val: 95, color: 'bg-amber-400' }, { label: 'Catching', val: 96, color: 'bg-emerald-400' }, { label: 'Route Running', val: 94, color: 'bg-blue-400' }, { label: 'Run Block', val: 45, color: 'bg-cyan-400' } ] },
-                { id: 'c4', num: '5', name: 'Tee Higgins', pos: 'Z-WR', nodeType: 'nfl_zwr', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4239993.png', height: '6\'4"', weight: '219 lbs', sal: '$21.8M', kam: 9.0, arch: 'Z-WR Contested Catcher', energy: 92,
-                  stats: [ { label: 'Rec Yards', last: '910', car: '68.5 YPG' }, { label: 'Rec TD', last: '10', car: '34' } ],
-                  traits: [ { label: 'Catch in Traffic', val: 94, color: 'bg-amber-400' }, { label: 'Spectacular Catch', val: 92, color: 'bg-emerald-400' } ] },
-                { id: 'c8', num: '97', name: 'Dexter Lawrence II', pos: 'LDT', nodeType: 'nfl_ldt', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4035486.png', height: '6\'4"', weight: '340 lbs', sal: '$22.5M', kam: 9.8, arch: 'Interior Dominator Anchor', energy: 88,
-                  stats: [ { label: 'Sacks', last: '9.0', car: '5.2 AVG' }, { label: 'Tackles For Loss', last: '14', car: '42 TOT' }, { label: 'Total Tackles', last: '58', car: '312 TOT' }, { label: 'QB Hits', last: '28', car: '91 TOT' } ],
-                  traits: [ { label: 'Block Shedding', val: 97, color: 'bg-amber-400' }, { label: 'Power Move', val: 99, color: 'bg-emerald-400' }, { label: 'Tackling', val: 94, color: 'bg-blue-400' }, { label: 'Play Recognition', val: 92, color: 'bg-cyan-400' } ] },
-                { id: 'c7', num: '64', name: 'Ted Karras', pos: 'C', nodeType: 'nfl_c', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/2972852.png', height: '6\'4"', weight: '305 lbs', sal: '$6.0M', kam: 8.4, arch: 'Center Anchor Line', energy: 90,
-                  stats: [ { label: 'Snaps Played', last: '100%', car: '95%' }, { label: 'Sacks Allowed', last: '1', car: '8' } ],
-                  traits: [ { label: 'Pass Block', val: 88, color: 'bg-amber-400' }, { label: 'Run Block', val: 82, color: 'bg-emerald-400' } ] }
+                { id: 'c1', num: '9', name: 'Joe Burrow', pos: 'QB', nodeType: 'nfl_qb', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/3915511.png', height: '6\'4"', weight: '215 lbs', sal: '$55.0M', kam: 9.6, arch: 'Shotgun Pocket Passer', energy: 95,
+                  scout: 'Elite pre-snap processor. Surgical accuracy in the intermediate zones. Best when operating out of empty sets to diagnose coverages.',
+                  stats: [ { label: 'Pass Yds', last: '4,918', car: '270.5 YPG' }, { label: 'Pass TD', last: '43', car: '140' }, { label: 'Interceptions', last: '9', car: '38' }, { label: 'Passer Rating', last: '108.5', car: '101.0' } ],
+                  traits: [ { label: 'Throw Acc', val: 96, color: 'bg-amber-400' }, { label: 'Awareness', val: 98, color: 'bg-emerald-400' }, { label: 'Agility', val: 78, color: 'bg-blue-400' }, { label: 'Break Sack', val: 82, color: 'bg-cyan-400' } ] },
+                { id: 'c2', num: '30', name: 'Chase Brown', pos: 'RB', nodeType: 'nfl_rb', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4362243.png', height: '5\'9"', weight: '210 lbs', sal: '$1.2M', kam: 8.5, arch: 'Explosive Cutback Back', energy: 92,
+                  scout: 'Home-run threat with immediate burst. Benefits immensely from light boxes when defenses play shell coverage against Chase/Higgins.',
+                  stats: [ { label: 'Rush Yds', last: '985', car: '52.0 YPG' }, { label: 'Rush TD', last: '7', car: '9' }, { label: 'Yds Per Carry', last: '4.5', car: '4.3' }, { label: 'Rec Yds', last: '321', car: '412' } ],
+                  traits: [ { label: 'Speed', val: 93, color: 'bg-amber-400' }, { label: 'Elusiveness', val: 88, color: 'bg-emerald-400' }, { label: 'Catching', val: 75, color: 'bg-blue-400' }, { label: 'Pass Block', val: 65, color: 'bg-cyan-400' } ] },
+                { id: 'c3', num: '1', name: 'Ja\'Marr Chase', pos: 'X-WR', nodeType: 'nfl_xwr', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4362628.png', height: '6\'0"', weight: '201 lbs', sal: '$35.0M', kam: 9.7, arch: 'X-WR Alpha Target', energy: 96,
+                  scout: 'Demands bracket coverage. Exceptional run-after-catch (RAC) ability. Can align at X or in the slot to dictate mismatches.',
+                  stats: [ { label: 'Rec Yards', last: '1,717', car: '88.4 YPG' }, { label: 'Rec TD', last: '17', car: '46' }, { label: 'Receptions', last: '127', car: '395' }, { label: 'Yds Per Rec', last: '13.5', car: '13.9' } ],
+                  traits: [ { label: 'Speed', val: 95, color: 'bg-amber-400' }, { label: 'Catching', val: 96, color: 'bg-emerald-400' }, { label: 'Route Run', val: 94, color: 'bg-blue-400' }, { label: 'Run Block', val: 45, color: 'bg-cyan-400' } ] },
+                { id: 'c4', num: '5', name: 'Tee Higgins', pos: 'Z-WR', nodeType: 'nfl_zwr', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4239993.png', height: '6\'4"', weight: '219 lbs', sal: '$21.8M', kam: 9.0, arch: 'Z-WR Contested Catcher', energy: 90,
+                  scout: 'Premier boundary ball-winner. Dominates single coverage when defenses shade towards Chase. Redzone specialist.',
+                  stats: [ { label: 'Rec Yards', last: '910', car: '68.5 YPG' }, { label: 'Rec TD', last: '10', car: '34' }, { label: 'Receptions', last: '72', car: '329' }, { label: 'Yds Per Rec', last: '12.6', car: '13.8' } ],
+                  traits: [ { label: 'Catch in Traffic', val: 96, color: 'bg-amber-400' }, { label: 'Spec Catch', val: 94, color: 'bg-emerald-400' }, { label: 'Release', val: 88, color: 'bg-blue-400' }, { label: 'Run Block', val: 70, color: 'bg-cyan-400' } ] },
+                { id: 'c8', num: '91', name: 'Trey Hendrickson', pos: 'RDE', nodeType: 'nfl_rdt', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/3120356.png', height: '6\'4"', weight: '270 lbs', sal: '$21.0M', kam: 9.4, arch: 'Edge Rusher', energy: 88,
+                  scout: 'Relentless motor. Elite first step and bend around the edge. Forces offensive lines to slide protection to his side.',
+                  stats: [ { label: 'Sacks', last: '17.5', car: '0.8 AVG' }, { label: 'TFL', last: '16', car: '58' }, { label: 'Total Tac', last: '43', car: '190' }, { label: 'QB Hits', last: '28', car: '120' } ],
+                  traits: [ { label: 'Finesse Move', val: 95, color: 'bg-amber-400' }, { label: 'Acceleration', val: 92, color: 'bg-emerald-400' }, { label: 'Tackling', val: 85, color: 'bg-blue-400' }, { label: 'Play Rec', val: 88, color: 'bg-cyan-400' } ] },
+                
+                // Bench
+                { id: 'c6', num: '80', name: 'Andrei Iosivas', pos: 'SLOT', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/4427366.png', height: '6\'3"', weight: '205 lbs', sal: '$1.1M', kam: 8.2, arch: 'Slot WR', energy: 94, scout: 'High-upside athlete emerging as a reliable slot target.', stats: [ { label: 'Yards', last: '420', car: '280 AVG' }, { label: 'TDs', last: '5', car: '8' } ], traits: [ { label: 'Speed', val: 92, color: 'bg-amber-400' }, { label: 'Catching', val: 82, color: 'bg-emerald-400' } ] },
+                { id: 'c7', num: '88', name: 'Mike Gesicki', pos: 'TE', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/nfl/players/full/3116365.png', height: '6\'6"', weight: '245 lbs', sal: '$3.2M', kam: 8.4, arch: 'Pass-Catching TE', energy: 91, scout: 'Essentially a big slot receiver. Limited in line blocking but creates mismatches vs LBs.', stats: [ { label: 'Yards', last: '384', car: '35.0 YPG' }, { label: 'TDs', last: '4', car: '22' } ], traits: [ { label: 'Spec Catch', val: 90, color: 'bg-amber-400' }, { label: 'Run Block', val: 45, color: 'bg-cyan-400' } ] }
             ],
             RMA: [
                 { id: 'r1', num: '9', name: 'Kylian Mbappé', pos: 'ST', nodeType: 'soc_st', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/215484.png', height: '178 cm', weight: '75 kg', sal: '€31.2M', kam: 9.8, arch: 'Inside Finishing Forward', energy: 94,
+                  scout: 'Devastating in transition. Functions best drifting slightly left to isolate defenders 1v1. Elite ball-striking with minimal backlift.',
                   stats: [ { label: 'Expected Goals (xG)', last: '0.82', car: '0.78' }, { label: 'Expected Assists (xA)', last: '0.28', car: '0.31' }, { label: 'Shot Creating Act (SCA)', last: '5.10', car: '4.85' }, { label: 'Pass Completion', last: '82%', car: '81%' } ],
-                  traits: [ { label: 'Pace & Acceleration', val: 97, color: 'bg-amber-400' }, { label: 'Finishing', val: 94, color: 'bg-emerald-400' }, { label: 'Dribbling', val: 93, color: 'bg-blue-400' }, { label: 'Defensive Workrate', val: 38, color: 'bg-cyan-400' } ] },
+                  traits: [ { label: 'Pace & Accel', val: 98, color: 'bg-amber-400' }, { label: 'Finishing', val: 95, color: 'bg-emerald-400' }, { label: 'Dribbling', val: 93, color: 'bg-blue-400' }, { label: 'Def Workrate', val: 38, color: 'bg-cyan-400' } ] },
                 { id: 'r2', num: '7', name: 'Vinícius Júnior', pos: 'LAM', nodeType: 'soc_lam', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/236188.png', height: '176 cm', weight: '73 kg', sal: '€20.8M', kam: 9.6, arch: 'Left Inside #10', energy: 92,
-                  stats: [ { label: 'Expected Goals (xG)', last: '0.62', car: '0.55' }, { label: 'Expected Assists (xA)', last: '0.45', car: '0.40' } ],
-                  traits: [ { label: 'Pace & Acceleration', val: 95, color: 'bg-amber-400' }, { label: 'Dribbling', val: 96, color: 'bg-blue-400' } ] },
-                { id: 'r4', num: '5', name: 'Jude Bellingham', pos: 'CM', nodeType: 'soc_cm', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/285223.png', height: '186 cm', weight: '75 kg', sal: '€20.8M', kam: 9.7, arch: 'Box-to-Box Dominator', energy: 95,
-                  stats: [ { label: 'Expected Goals (xG)', last: '0.48', car: '0.35' }, { label: 'Shot Creating Act (SCA)', last: '5.40', car: '4.20' } ],
-                  traits: [ { label: 'Vision & Passing', val: 90, color: 'bg-amber-400' }, { label: 'Physicality', val: 88, color: 'bg-emerald-400' } ] },
+                  scout: 'The primary progressive outlet. Unpredictable 1v1 dribbler who breaks low blocks. Chemistry with Mbappé forces narrow defensive shapes.',
+                  stats: [ { label: 'Expected Goals (xG)', last: '0.62', car: '0.55' }, { label: 'Expected Assists (xA)', last: '0.45', car: '0.40' }, { label: 'Shot Creating Act', last: '6.20', car: '5.80' }, { label: 'Pass Completion', last: '78%', car: '80%' } ],
+                  traits: [ { label: 'Pace & Accel', val: 96, color: 'bg-amber-400' }, { label: 'Dribbling', val: 97, color: 'bg-emerald-400' }, { label: 'Vision', val: 84, color: 'bg-blue-400' }, { label: 'Def Workrate', val: 42, color: 'bg-cyan-400' } ] },
+                { id: 'r4', num: '5', name: 'Jude Bellingham', pos: 'CM', nodeType: 'soc_cm', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/285223.png', height: '186 cm', weight: '75 kg', sal: '€20.8M', kam: 9.7, arch: 'Box-to-Box Dominator', energy: 96,
+                  scout: 'Covers massive ground. Elite late runs into the box. Provides the physical presence required to balance the attacking trio.',
+                  stats: [ { label: 'Expected Goals (xG)', last: '0.48', car: '0.35' }, { label: 'Expected Assists (xA)', last: '0.35', car: '0.28' }, { label: 'Shot Creating Act', last: '5.40', car: '4.20' }, { label: 'Pass Completion', last: '88%', car: '86%' } ],
+                  traits: [ { label: 'Vision & Pass', val: 90, color: 'bg-amber-400' }, { label: 'Physicality', val: 88, color: 'bg-emerald-400' }, { label: 'Finishing', val: 86, color: 'bg-blue-400' }, { label: 'Tackling', val: 80, color: 'bg-cyan-400' } ] },
                 { id: 'r9', num: '22', name: 'Antonio Rüdiger', pos: 'CB', nodeType: 'soc_cb', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/156687.png', height: '190 cm', weight: '85 kg', sal: '€14.5M', kam: 9.0, arch: 'Physical Leader Anchor', energy: 90,
-                  stats: [ { label: 'Pass Completion', last: '91%', car: '88%' }, { label: 'Tackles Won', last: '2.4', car: '2.1' } ],
-                  traits: [ { label: 'Defensive Awareness', val: 92, color: 'bg-amber-400' }, { label: 'Aggression', val: 94, color: 'bg-emerald-400' } ] }
+                  scout: 'Enforcer at the back. Elite recovery pace allows Madrid to hold a high line. Aggressive in defensive duels.',
+                  stats: [ { label: 'Pass Completion', last: '91%', car: '88%' }, { label: 'Tackles Won / 90', last: '2.4', car: '2.1' }, { label: 'Aerial Win %', last: '72%', car: '68%' }, { label: 'Interceptions', last: '1.8', car: '1.5' } ],
+                  traits: [ { label: 'Def Awareness', val: 92, color: 'bg-amber-400' }, { label: 'Aggression', val: 95, color: 'bg-emerald-400' }, { label: 'Pace', val: 84, color: 'bg-blue-400' }, { label: 'Passing', val: 78, color: 'bg-cyan-400' } ] },
+                { id: 'r11', num: '1', name: 'Thibaut Courtois', pos: 'GK', nodeType: 'soc_gk', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/132049.png', height: '200 cm', weight: '96 kg', sal: '€15.0M', kam: 9.4, arch: 'Shot Stopper', energy: 95,
+                  scout: 'Commands the box brilliantly. Allows the defense to aggressively push forward knowing his 1v1 and shot-stopping abilities are elite.',
+                  stats: [ { label: 'Save %', last: '78.5%', car: '76.2%' }, { label: 'Clean Sheets', last: '18', car: '140' }, { label: 'PSxG-GA', last: '+5.2', car: '+4.1' }, { label: 'Pass Completion', last: '82%', car: '78%' } ],
+                  traits: [ { label: 'Reflexes', val: 94, color: 'bg-amber-400' }, { label: 'Positioning', val: 96, color: 'bg-emerald-400' }, { label: 'Distribution', val: 75, color: 'bg-blue-400' }, { label: 'Command', val: 92, color: 'bg-cyan-400' } ] },
+
+                // Bench
+                { id: 'r3', num: '11', name: 'Rodrygo', pos: 'RW', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/253303.png', height: '174 cm', weight: '68 kg', sal: '€12.5M', kam: 9.1, arch: 'Technical Winger', energy: 90, scout: 'Incredible close control. Tactical flexibility allows him to play across the front line.', stats: [ { label: 'xG', last: '0.45', car: '0.38' }, { label: 'SCA', last: '4.8', car: '4.2' } ], traits: [ { label: 'Dribbling', val: 92, color: 'bg-amber-400' }, { label: 'Finishing', val: 86, color: 'bg-blue-400' } ] },
+                { id: 'r5', num: '14', name: 'A. Tchouaméni', pos: 'DM', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/240752.png', height: '187 cm', weight: '81 kg', sal: '€12.5M', kam: 9.1, arch: 'Anchor Pivot', energy: 91, scout: 'Breaks up play and shields the defense. Vital for resting Bellingham or securing leads.', stats: [ { label: 'Pass%', last: '92%', car: '90%' }, { label: 'Tackles', last: '3.1', car: '2.8' } ], traits: [ { label: 'Def Awareness', val: 92, color: 'bg-amber-400' }, { label: 'Strength', val: 88, color: 'bg-blue-400' } ] }
             ],
             MUN: [
                 { id: 'm2', num: '8', name: 'Bruno Fernandes', pos: 'LAM', nodeType: 'soc_lam', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/180213.png', height: '179 cm', weight: '69 kg', sal: '€15.6M', kam: 9.1, arch: 'Volume Chance Creator', energy: 94,
-                  stats: [ { label: 'Expected Goals (xG)', last: '0.35', car: '0.32' }, { label: 'Expected Assists (xA)', last: '0.42', car: '0.38' }, { label: 'Shot Creating Act (SCA)', last: '6.80', car: '5.90' }, { label: 'Pass Completion', last: '78%', car: '76%' } ],
-                  traits: [ { label: 'Vision & Passing', val: 92, color: 'bg-amber-400' }, { label: 'Long Shots', val: 84, color: 'bg-emerald-400' }, { label: 'Stamina', val: 95, color: 'bg-blue-400' }, { label: 'Defensive Workrate', val: 68, color: 'bg-cyan-400' } ] },
+                  scout: 'The creative engine. High-risk, high-reward passing style. Relentless pressing energy but can occasionally abandon structural discipline to chase the ball.',
+                  stats: [ { label: 'Expected Goals (xG)', last: '0.35', car: '0.32' }, { label: 'Expected Assists (xA)', last: '0.42', car: '0.38' }, { label: 'Shot Creating Act', last: '6.80', car: '5.90' }, { label: 'Pass Completion', last: '78%', car: '76%' } ],
+                  traits: [ { label: 'Vision & Pass', val: 94, color: 'bg-amber-400' }, { label: 'Long Shots', val: 86, color: 'bg-emerald-400' }, { label: 'Stamina', val: 96, color: 'bg-blue-400' }, { label: 'Def Workrate', val: 72, color: 'bg-cyan-400' } ] },
+                { id: 'm4', num: '37', name: 'Kobbie Mainoo', pos: 'CM', nodeType: 'soc_cm', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/329583.png', height: '175 cm', weight: '70 kg', sal: '€2.5M', kam: 8.9, arch: 'Press-Resistant Pivot', energy: 95,
+                  scout: 'Exceptional close control in tight spaces. Glides past the first line of the press. Still developing elite final-third output.',
+                  stats: [ { label: 'Expected Goals (xG)', last: '0.18', car: '0.12' }, { label: 'Expected Assists (xA)', last: '0.22', car: '0.15' }, { label: 'Shot Creating Act', last: '3.80', car: '2.50' }, { label: 'Pass Completion', last: '90%', car: '88%' } ],
+                  traits: [ { label: 'Dribbling', val: 88, color: 'bg-amber-400' }, { label: 'Passing', val: 86, color: 'bg-emerald-400' }, { label: 'Agility', val: 90, color: 'bg-blue-400' }, { label: 'Def Awareness', val: 78, color: 'bg-cyan-400' } ] },
                 { id: 'm9', num: '4', name: 'Matthijs de Ligt', pos: 'CB', nodeType: 'soc_cb', role: 'Starter', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/225010.png', height: '189 cm', weight: '89 kg', sal: '€10.4M', kam: 8.7, arch: 'Aerial Box Stopper', energy: 89,
-                  stats: [ { label: 'Pass Completion', last: '88%', car: '89%' }, { label: 'Aerial Duels Won', last: '72%', car: '68%' } ],
-                  traits: [ { label: 'Defensive Awareness', val: 90, color: 'bg-amber-400' }, { label: 'Strength', val: 92, color: 'bg-emerald-400' } ] }
+                  scout: 'Vocal leader at the back. Dominant in the air but can be exposed for pace in a high line. Excellent progressive passing range.',
+                  stats: [ { label: 'Pass Completion', last: '89%', car: '89%' }, { label: 'Aerial Duels Won', last: '72%', car: '68%' }, { label: 'Clearances', last: '4.5', car: '4.2' }, { label: 'Interceptions', last: '1.2', car: '1.1' } ],
+                  traits: [ { label: 'Def Awareness', val: 90, color: 'bg-amber-400' }, { label: 'Strength', val: 92, color: 'bg-emerald-400' }, { label: 'Passing', val: 82, color: 'bg-blue-400' }, { label: 'Pace', val: 68, color: 'bg-cyan-400' } ] },
+                
+                // Bench
+                { id: 'm1', num: '11', name: 'Joshua Zirkzee', pos: 'ST', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/262524.png', height: '193 cm', weight: '89 kg', sal: '€6.5M', kam: 8.4, arch: 'Linkup Target Striker', energy: 90, scout: 'Drops deep to link play, vacating space for wingers to invert. Not a pure goalscorer but an elite facilitator.', stats: [ { label: 'xG', last: '0.42', car: '0.38' }, { label: 'SCA', last: '3.9', car: '3.5' } ], traits: [ { label: 'Passing', val: 84, color: 'bg-amber-400' }, { label: 'Finishing', val: 78, color: 'bg-blue-400' } ] },
+                { id: 'm10', num: '6', name: 'Lisandro Martínez', pos: 'CB', role: 'Bench', photo: 'https://a.espncdn.com/i/headshots/soccer/players/full/236186.png', height: '175 cm', weight: '77 kg', sal: '€7.2M', kam: 8.8, arch: 'Aggressive Line-Breaker', energy: 91, scout: 'Elite line-breaking passer from the left side. Extremely aggressive in duels but injury history is a concern.', stats: [ { label: 'Pass%', last: '91%', car: '89%' }, { label: 'Tackles', last: '2.5', car: '2.1' } ], traits: [ { label: 'Aggression', val: 96, color: 'bg-amber-400' }, { label: 'Passing', val: 88, color: 'bg-blue-400' } ] }
             ]
         };
-
-        let ORIGINAL_ROSTER = {};
-        Object.keys(ROSTERS).forEach(team => {
-            ORIGINAL_ROSTER[team] = JSON.parse(JSON.stringify(ROSTERS[team]));
-        });
 
         // Application State
         let state = {
             league: 'NBA',
             team: 'GSW',
-            activeTab: 'overview',
             activePlayerId: null,
             gridVisible: false,
             nodesVisible: true
         };
 
+        window.onload = function() {
+            populateTeamSelector('NBA');
+            switchTeam('GSW');
+        };
+
+        // --- COMMAND CENTER LOGIC ---
         function toggleDropdown(id) {
             const dropdown = document.getElementById(id);
             const isVisible = dropdown.classList.contains('opacity-100');
@@ -557,17 +628,37 @@
         function selectTeam(id) {
             state.team = id;
             const team = TEAMS[id];
-            document.getElementById('selected-team-label').innerHTML = `${team.name} <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>`;
             
-            // Update Headers
-            document.getElementById('board-title').innerHTML = `${team.name} <i class="fa-solid fa-circle-check text-amber-500 text-sm ml-1"></i>`;
-            document.getElementById('board-subtitle').innerText = team.style;
-            document.getElementById('board-kam').innerText = `KAM ${team.kam}`;
+            // Shorten name for mobile dropdown label if needed
+            let shortName = team.name.split(' ').slice(0, 2).join(' ');
+            if (shortName.length > 15) shortName = team.name.split(' ')[0];
+            document.getElementById('selected-team-label').innerHTML = `${shortName} <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>`;
+            
+            // Update Dashboard
+            document.getElementById('kpi-logo').src = team.logo;
+            document.getElementById('kpi-title').innerHTML = `${team.name}`;
+            document.getElementById('kpi-subtitle').innerText = team.style;
+            
+            document.getElementById('kpi-manager-name').innerText = team.manager;
+            document.getElementById('kpi-manager-role').innerText = "Head Coach";
 
-            // Reset Sub State for this team
-            ROSTERS[id] = JSON.parse(JSON.stringify(ORIGINAL_ROSTER[id] || []));
+            document.getElementById('stat-kam').innerText = team.kam;
+            document.getElementById('stat-standing').innerText = team.standing;
+            document.getElementById('stat-metric').innerText = team.metric;
+            document.getElementById('stat-chem').innerText = team.chem;
+            document.getElementById('stat-cap').innerText = team.cap;
+            document.getElementById('stat-system').innerText = team.system;
 
+            // Render Board
             renderBoardSurface(team);
+            
+            // Reset grid state
+            state.gridVisible = false;
+            document.getElementById('surface-svg-zones').classList.replace('opacity-40', 'opacity-0');
+            document.getElementById('btn-toggle-zones').classList.remove('text-amber-400', 'bg-amber-500/10');
+            document.getElementById('btn-toggle-zones').classList.add('text-slate-400');
+
+            // Render Nodes
             renderNodes();
             renderBench();
             
@@ -579,15 +670,17 @@
             toggleDropdown('team-dropdown');
         }
 
+        // --- TACTICAL BOARD ENGINE ---
         function renderBoardSurface(team) {
             const surface = document.getElementById('tactical-surface');
-            surface.className = `relative ${team.surface} border border-slate-800 rounded-2xl flex-grow min-h-[700px] overflow-hidden shadow-2xl flex flex-col`;
+            surface.className = `relative ${team.surface} border border-slate-800 rounded-2xl flex-grow min-h-[650px] overflow-hidden shadow-2xl flex flex-col transition-all duration-500`;
             
-            document.getElementById('surface-logo-img').src = team.logo;
+            document.getElementById('surface-logo-img-board').src = team.logo;
             
             const baseSvg = document.getElementById('surface-svg-base');
             const zoneSvg = document.getElementById('surface-svg-zones');
 
+            // Sport Specific Court/Pitch Drawings & Dynamic Grids
             if (team.league === 'NBA') {
                 baseSvg.innerHTML = `
                     <rect x="170" y="20" width="160" height="190" fill="rgba(29, 66, 138, 0.25)" stroke="#FFFFFF" stroke-width="3"/>
@@ -598,18 +691,26 @@
                     <line x1="0" y1="480" x2="500" y2="480" stroke="#FFFFFF" stroke-width="3"/>
                     <path d="M 190 480 A 60 60 0 0 1 310 480" fill="none" stroke="#FFFFFF" stroke-width="3"/>
                 `;
+                // Basketball Grid: Shooting Sectors
                 zoneSvg.innerHTML = `
                     <line x1="166" y1="0" x2="166" y2="500" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/>
                     <line x1="333" y1="0" x2="333" y2="500" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/>
                     <line x1="0" y1="250" x2="500" y2="250" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/>
                 `;
+                document.getElementById('surface-logo-overlay').className = "absolute top-12 right-12 opacity-15 pointer-events-none transition-all duration-700";
             } else if (team.league === 'NFL') {
                 baseSvg.innerHTML = `
                     <line x1="0" y1="250" x2="500" y2="250" stroke="#FFC72C" stroke-width="4"/>
                     <line x1="0" y1="120" x2="500" y2="120" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10,10"/>
                     <line x1="0" y1="380" x2="500" y2="380" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10,10"/>
                 `;
-                zoneSvg.innerHTML = `<rect x="150" y="0" width="200" height="500" fill="rgba(245, 158, 11, 0.1)" stroke="none"/>`;
+                // NFL Grid: Hashes and Redzone
+                zoneSvg.innerHTML = `
+                    <rect x="0" y="0" width="500" height="100" fill="rgba(220, 38, 38, 0.15)" stroke="none"/>
+                    <line x1="180" y1="0" x2="180" y2="500" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+                    <line x1="320" y1="0" x2="320" y2="500" stroke="rgba(255, 255, 255, 0.3)" stroke-width="1" stroke-dasharray="4,4"/>
+                `;
+                document.getElementById('surface-logo-overlay').className = "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-15 pointer-events-none transition-all duration-700";
             } else {
                 // Soccer
                 baseSvg.innerHTML = `
@@ -619,10 +720,72 @@
                     <line x1="0" y1="250" x2="500" y2="250" stroke="#FFFFFF" stroke-width="3"/>
                     <rect x="100" y="400" width="300" height="90" fill="none" stroke="#FFFFFF" stroke-width="3"/>
                 `;
-                zoneSvg.innerHTML = `<line x1="166" y1="0" x2="166" y2="500" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/><line x1="333" y1="0" x2="333" y2="500" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/>`;
+                // Soccer Grid: 5 Positional Channels (Half-spaces)
+                zoneSvg.innerHTML = `
+                    <line x1="100" y1="0" x2="100" y2="500" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/>
+                    <line x1="200" y1="0" x2="200" y2="500" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/>
+                    <line x1="300" y1="0" x2="300" y2="500" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/>
+                    <line x1="400" y1="0" x2="400" y2="500" stroke="rgba(245, 158, 11, 0.5)" stroke-width="1" stroke-dasharray="4,4"/>
+                `;
+                document.getElementById('surface-logo-overlay').className = "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-10 pointer-events-none transition-all duration-700";
             }
         }
 
+        // --- TOOLBOX LOGIC ---
+        function toggleZones() {
+            state.gridVisible = !state.gridVisible;
+            const svg = document.getElementById('surface-svg-zones');
+            const btn = document.getElementById('btn-toggle-zones');
+            
+            if (state.gridVisible) {
+                svg.classList.replace('opacity-0', 'opacity-40');
+                btn.classList.add('text-amber-400', 'bg-amber-500/10');
+                btn.classList.remove('text-slate-400');
+            } else {
+                svg.classList.replace('opacity-40', 'opacity-0');
+                btn.classList.remove('text-amber-400', 'bg-amber-500/10');
+                btn.classList.add('text-slate-400');
+            }
+        }
+
+        function toggleNodes() {
+            state.nodesVisible = !state.nodesVisible;
+            const cont = document.getElementById('court-nodes-container');
+            const btn = document.getElementById('btn-toggle-nodes');
+            
+            if (state.nodesVisible) {
+                cont.classList.replace('opacity-0', 'opacity-100');
+                btn.classList.remove('text-blue-400', 'bg-blue-500/10');
+                btn.classList.add('text-slate-400');
+            } else {
+                cont.classList.replace('opacity-100', 'opacity-0');
+                btn.classList.add('text-blue-400', 'bg-blue-500/10');
+                btn.classList.remove('text-slate-400');
+            }
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById('board-container');
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                }
+                container.classList.add('bg-obsidian', 'p-4');
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const container = document.getElementById('board-container');
+            if (!document.fullscreenElement) {
+                container.classList.remove('bg-obsidian', 'p-4');
+            }
+        });
+
+        // --- RENDER NODES & BENCH ---
         function getSvgAvatar(name, num) {
             const init = name.split(' ').map(n=>n[0]).join('').substring(0,2);
             const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%231e293b"/><text x="50" y="48" font-family="sans-serif" font-size="28" font-weight="bold" fill="%23f8fafc" text-anchor="middle" dy=".3em">${init}</text><text x="50" y="75" font-family="sans-serif" font-size="18" font-weight="bold" fill="%23f59e0b" text-anchor="middle">#${num}</text></svg>`;
@@ -651,13 +814,13 @@
                 
                 const html = `
                     <div id="node-${p.id}" onclick="inspectPlayer('${p.id}')" class="absolute ${posCSS} flex flex-col items-center cursor-pointer magnetic-node z-20">
-                        <div class="w-14 h-14 rounded-full border-2 border-amber-500 bg-obsidian flex items-center justify-center relative shadow-lg transition-all duration-300 ${isSelected ? 'selected-node' : ''}">
-                            <img src="${p.photo}" class="w-12 h-12 rounded-full object-cover" onerror="this.src='${getSvgAvatar(p.name, p.num)}'">
-                            <span class="absolute -top-1 -right-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-600 shadow-sm">#${p.num}</span>
+                        <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border-2 border-amber-500 bg-obsidian flex items-center justify-center relative shadow-lg transition-all duration-300 ${isSelected ? 'selected-node' : ''}">
+                            <img src="${p.photo}" class="w-10 h-10 lg:w-12 lg:h-12 rounded-full object-cover" onerror="this.src='${getSvgAvatar(p.name, p.num)}'">
+                            <span class="absolute -top-1 -right-1 text-[8px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-600 shadow-sm">#${p.num}</span>
                         </div>
-                        <div class="mt-1 bg-slate-900/80 backdrop-blur rounded px-2 py-0.5 border border-slate-700/50 flex flex-col items-center">
-                            <span class="font-bold text-white text-[10px] tracking-wide whitespace-nowrap">${p.name}</span>
-                            <span class="text-[9px] font-mono text-slate-400">${p.pos} • KAM ${p.kam}</span>
+                        <div class="mt-1 bg-slate-900/80 backdrop-blur rounded px-2 py-0.5 border border-slate-700/50 flex flex-col items-center pointer-events-none">
+                            <span class="font-bold text-white text-[10px] tracking-wide whitespace-nowrap drop-shadow">${p.name}</span>
+                            <span class="text-[9px] font-mono text-slate-400 drop-shadow">${p.pos}</span>
                         </div>
                     </div>
                 `;
@@ -684,7 +847,7 @@
                                 <span class="text-[9px] text-slate-400 font-mono">${p.pos} • #${p.num}</span>
                             </div>
                         </div>
-                        <button onclick="executeSwap('${p.id}'); event.stopPropagation();" class="px-2 py-1 bg-amber-500 text-slate-950 hover:bg-amber-400 font-mono font-bold text-[9px] rounded transition-colors shadow">
+                        <button onclick="executeSwap('${p.id}'); event.stopPropagation();" class="px-2 py-1 bg-slate-800 text-slate-300 hover:text-slate-950 border border-slate-600 hover:bg-amber-400 font-mono font-bold text-[9px] rounded transition-colors shadow">
                             SWAP
                         </button>
                     </div>
@@ -693,6 +856,7 @@
             });
         }
 
+        // --- DOSSIER LOGIC & ANIMATIONS ---
         function switchView(view) {
             const pill = document.getElementById('view-pill');
             const vTactical = document.getElementById('view-tactical');
@@ -719,22 +883,17 @@
         }
 
         function switchDossierTab(tabId) {
-            state.activeTab = tabId;
-            
             ['overview', 'stats', 'traits'].forEach(id => {
                 const btn = document.getElementById(`tab-btn-${id}`);
+                const content = document.getElementById(`tab-${id}`);
+                
                 if(id === tabId) {
                     btn.classList.add('border-amber-500', 'text-amber-400');
                     btn.classList.remove('border-transparent', 'hover:text-slate-300', 'text-slate-500');
+                    content.classList.add('active');
                 } else {
                     btn.classList.remove('border-amber-500', 'text-amber-400');
                     btn.classList.add('border-transparent', 'hover:text-slate-300', 'text-slate-500');
-                }
-                
-                const content = document.getElementById(`tab-${id}`);
-                if(id === tabId) {
-                    content.classList.add('active');
-                } else {
                     content.classList.remove('active');
                 }
             });
@@ -746,7 +905,6 @@
 
         function inspectPlayer(id) {
             state.activePlayerId = id;
-            
             renderNodes();
             renderBench();
 
@@ -760,7 +918,6 @@
             
             document.getElementById('dossier-name').innerText = p.name;
             document.getElementById('dossier-role').innerText = `${p.pos} • ${p.arch}`;
-            // Safely merged KAM score into the badge
             document.getElementById('dossier-badge').innerText = `#${p.num} • KAM ${p.kam}`;
 
             // Tab 1: Overview
@@ -769,6 +926,7 @@
             document.getElementById('dos-sal').innerText = p.sal;
             document.getElementById('dos-energy-val').innerText = `${p.energy}%`;
             document.getElementById('dos-energy-bar').setAttribute('data-target', p.energy);
+            document.getElementById('dos-scout').innerText = `"${p.scout}"`;
             
             const eBar = document.getElementById('dos-energy-bar');
             eBar.className = `h-full stat-bar-fill ${p.energy > 85 ? 'bg-emerald-500' : (p.energy > 70 ? 'bg-amber-500' : 'bg-rose-500')}`;
@@ -807,6 +965,7 @@
                 });
             }
 
+            // Trigger animations
             document.querySelectorAll('.stat-bar-fill').forEach(el => el.style.width = '0%');
             requestAnimationFrame(() => {
                 setTimeout(animateBars, 50);
@@ -821,6 +980,19 @@
                 }
             });
         }
+
+        // --- SUB LOGIC ---
+        // Store original lineup for reset
+        let originalLineups = {};
+        
+        function storeOriginals() {
+            Object.keys(ROSTERS).forEach(key => {
+                originalLineups[key] = JSON.parse(JSON.stringify(ROSTERS[key]));
+            });
+        }
+        
+        // Call it immediately
+        storeOriginals();
 
         function executeSwap(benchId) {
             const squad = ROSTERS[state.team];
@@ -853,41 +1025,9 @@
             }
         }
 
-        function toggleZones() {
-            state.gridVisible = !state.gridVisible;
-            const svg = document.getElementById('surface-svg-zones');
-            const btn = document.getElementById('btn-toggle-zones');
-            
-            if (state.gridVisible) {
-                svg.classList.replace('opacity-0', 'opacity-40');
-                btn.classList.add('text-amber-400', 'bg-amber-500/10');
-                btn.classList.remove('text-slate-400');
-            } else {
-                svg.classList.replace('opacity-40', 'opacity-0');
-                btn.classList.remove('text-amber-400', 'bg-amber-500/10');
-                btn.classList.add('text-slate-400');
-            }
-        }
-
-        function toggleNodes() {
-            state.nodesVisible = !state.nodesVisible;
-            const cont = document.getElementById('court-nodes-container');
-            const btn = document.getElementById('btn-toggle-nodes');
-            
-            if (state.nodesVisible) {
-                cont.classList.replace('opacity-0', 'opacity-100');
-                btn.classList.remove('text-blue-400', 'bg-blue-500/10');
-                btn.classList.add('text-slate-400');
-            } else {
-                cont.classList.replace('opacity-100', 'opacity-0');
-                btn.classList.add('text-blue-400', 'bg-blue-500/10');
-                btn.classList.remove('text-slate-400');
-            }
-        }
-
         function resetLineup() {
-            if(ORIGINAL_ROSTER[state.team]) {
-                ROSTERS[state.team] = JSON.parse(JSON.stringify(ORIGINAL_ROSTER[state.team]));
+            if(originalLineups[state.team]) {
+                ROSTERS[state.team] = JSON.parse(JSON.stringify(originalLineups[state.team]));
                 renderNodes();
                 renderBench();
                 if(ROSTERS[state.team].length > 0) {
@@ -895,27 +1035,6 @@
                 }
             }
         }
-
-        function toggleFullscreen() {
-            const container = document.getElementById('board-container');
-            if (!document.fullscreenElement) {
-                if (container.requestFullscreen) {
-                    container.requestFullscreen();
-                }
-                container.classList.add('bg-obsidian', 'p-4');
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        }
-
-        document.addEventListener('fullscreenchange', () => {
-            const container = document.getElementById('board-container');
-            if (!document.fullscreenElement) {
-                container.classList.remove('bg-obsidian', 'p-4');
-            }
-        });
 
         function renderFullRoster() {
             const container = document.getElementById('roster-grid-container');
@@ -925,7 +1044,7 @@
             squad.forEach(p => {
                 const roleBadge = p.role === 'Starter' ? '<span class="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 rounded text-[9px]">Starter</span>' : '<span class="bg-slate-700/50 text-slate-300 border border-slate-600 px-2 rounded text-[9px]">Bench</span>';
                 container.innerHTML += `
-                    <div class="glass-card p-4 rounded-xl border border-slate-800 flex items-center space-x-4 hover:border-slate-600 transition-colors">
+                    <div class="glass-card p-4 rounded-xl border border-slate-800 flex items-center space-x-4 hover:border-amber-500/50 transition-colors cursor-pointer" onclick="switchView('tactical'); setTimeout(()=>inspectPlayer('${p.id}'), 100);">
                         <img src="${p.photo}" class="w-12 h-12 rounded-full object-cover border border-slate-700" onerror="this.src='${getSvgAvatar(p.name, p.num)}'">
                         <div>
                             <span class="font-bold text-white block text-sm">${p.name}</span>
@@ -938,11 +1057,6 @@
                 `;
             });
         }
-
-        // Initialize App
-        window.onload = () => {
-            selectLeague('NBA', '🇺🇸 NBA Basketball');
-        };
 
     </script>
 </body>
