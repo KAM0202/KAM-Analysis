@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAM GM Intelligence Workspace v4.0</title>
+    <title>KAM GM Intelligence Workspace | Final Proxy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,7 +19,6 @@
         }
     </script>
     <style>
-        /* Glassmorphism utility classes */
         .glass-panel {
             background: rgba(17, 24, 39, 0.75);
             backdrop-filter: blur(12px);
@@ -32,58 +31,113 @@
             background-attachment: fixed;
             transition: background-image 0.5s ease-in-out;
         }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
 <body id="app-body" class="text-white font-sans antialiased min-h-screen bg-gray-900" style="background-image: url('https://images.unsplash.com/photo-1542359649-31e03cd4d909?q=80&w=2000&auto=format&fit=crop');">
     
-    <!-- Heavy Overlay to ensure text readability -->
-    <div class="min-h-screen bg-black/60 pb-10">
+    <div class="min-h-screen bg-black/65 pb-10">
         
-        <!-- Header & Franchise Toggle -->
-        <header class="glass-panel sticky top-0 z-50 border-b border-gray-700 p-4 mb-6 shadow-2xl">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <!-- Top Header & Franchise Toggle -->
+        <header class="glass-panel sticky top-0 z-50 border-b border-gray-700 shadow-2xl">
+            <div class="max-w-7xl mx-auto p-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-100 tracking-tight">Executive Operations Command</h1>
                     <p class="text-sm text-gray-300">KAM GM Intelligence Workspace | <span id="team-name-header" class="text-gold-500 font-semibold">Como 1907 Proxy</span></p>
                 </div>
-                <div class="flex gap-2 bg-black/50 p-1 rounded-lg border border-gray-600">
-                    <button onclick="switchTeam('como')" id="btn-como" class="team-btn px-4 py-2 text-sm font-semibold rounded bg-gray-700 text-white transition">Como 1907</button>
-                    <button onclick="switchTeam('rm')" id="btn-rm" class="team-btn px-4 py-2 text-sm font-semibold rounded hover:bg-gray-700 text-gray-400 transition">Real Madrid</button>
-                    <button onclick="switchTeam('mu')" id="btn-mu" class="team-btn px-4 py-2 text-sm font-semibold rounded hover:bg-gray-700 text-gray-400 transition">Man Utd</button>
-                    <button onclick="switchTeam('gsw')" id="btn-gsw" class="team-btn px-4 py-2 text-sm font-semibold rounded hover:bg-gray-700 text-gray-400 transition">GSW</button>
-                    <button onclick="switchTeam('cin')" id="btn-cin" class="team-btn px-4 py-2 text-sm font-semibold rounded hover:bg-gray-700 text-gray-400 transition">Bengals</button>
+                
+                <div class="flex items-center gap-4">
+                    <!-- Simulation Toggle -->
+                    <div class="flex items-center gap-2 bg-gray-800/80 px-3 py-1.5 rounded-lg border border-gray-600 cursor-pointer hover:bg-gray-700 transition">
+                        <span class="text-xs font-semibold text-gray-300 uppercase tracking-wide">Simulation Mode</span>
+                        <div class="w-8 h-4 bg-gray-600 rounded-full relative">
+                            <div class="w-4 h-4 bg-gray-400 rounded-full absolute left-0 shadow-sm"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Toggles -->
+                    <div class="flex gap-1 bg-black/50 p-1 rounded-lg border border-gray-600">
+                        <button onclick="switchTeam('como')" id="btn-como" class="team-btn px-3 py-1.5 text-xs font-semibold rounded bg-gray-700 text-white transition">Como 1907</button>
+                        <button onclick="switchTeam('rm')" id="btn-rm" class="team-btn px-3 py-1.5 text-xs font-semibold rounded hover:bg-gray-700 text-gray-400 transition">Real Madrid</button>
+                        <button onclick="switchTeam('gsw')" id="btn-gsw" class="team-btn px-3 py-1.5 text-xs font-semibold rounded hover:bg-gray-700 text-gray-400 transition">GSW</button>
+                    </div>
+
+                    <!-- Board Pack Export -->
+                    <button class="bg-gold-500 hover:bg-gold-400 text-black text-xs font-bold px-4 py-2 rounded shadow-lg transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Export Board Pack
+                    </button>
                 </div>
+            </div>
+            
+            <!-- Secondary Navigation (Gateway to deep-dives) -->
+            <div class="max-w-7xl mx-auto px-4 py-2 border-t border-gray-700/50 flex gap-6 text-sm">
+                <a href="#" class="text-white font-semibold border-b-2 border-gold-500 pb-1">Command Center</a>
+                <a href="#" class="text-gray-400 hover:text-gray-200 transition pb-1">Financial Ledger (P&L / BS)</a>
+                <a href="#" class="text-gray-400 hover:text-gray-200 transition pb-1">Roster Asset ROI</a>
+                <a href="#" class="text-gray-400 hover:text-gray-200 transition pb-1">Infrastructure & ESG</a>
             </div>
         </header>
 
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
             
-            <!-- Strategic AI Briefing -->
-            <div class="lg:col-span-2 glass-panel p-6 rounded-xl shadow-xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Strategic AI Briefing
-                    </h2>
-                    <span class="bg-blue-900/80 text-blue-300 text-xs px-2 py-1 rounded border border-blue-700">Updated 08:00 AM</span>
-                </div>
-                <p id="briefing-text" class="text-gray-200 leading-relaxed text-sm mb-4">
-                    Stadio Giuseppe Sinigaglia DOCFAP (Feasibility) phase is entering critical review with Populous. Lifestyle apparel margins via Adidas production freedoms are offsetting standard matchday limitations. Ensure Villa Carminati hospitality structural plans align with Phase 1 rollout.
-                </p>
-                <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-600/50">
-                    <div>
-                        <h4 class="text-xs text-gray-400 uppercase tracking-wide mb-1">Primary Objective</h4>
-                        <p id="objective-text" class="text-sm font-semibold text-green-400">Secure DOCFAP Approval by May 2026</p>
+            <!-- Left Column: Briefing & Financials Snapshot -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Strategic AI Briefing -->
+                <div class="glass-panel p-6 rounded-xl shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <svg class="w-5 h-5 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Strategic AI Briefing
+                        </h2>
+                        <span class="bg-blue-900/80 text-blue-300 text-xs px-2 py-1 rounded border border-blue-700">Updated 08:00 AM</span>
                     </div>
-                    <div>
-                        <h4 class="text-xs text-gray-400 uppercase tracking-wide mb-1">Risk Vector</h4>
-                        <p id="risk-text" class="text-sm font-semibold text-red-400">Lakefront logistical constraints</p>
+                    <p id="briefing-text" class="text-gray-200 leading-relaxed text-sm mb-4">
+                        Stadio Giuseppe Sinigaglia DOCFAP phase is in critical review. Lifestyle apparel margins via Adidas offset matchday limitations. Ensure Villa Carminati hospitality structural plans align with Phase 1 rollout.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-600/50">
+                        <div>
+                            <h4 class="text-xs text-gray-400 uppercase tracking-wide mb-1">Primary Objective</h4>
+                            <p id="objective-text" class="text-sm font-semibold text-green-400">Secure DOCFAP Approval by May 2026</p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs text-gray-400 uppercase tracking-wide mb-1">Risk Vector</h4>
+                            <p id="risk-text" class="text-sm font-semibold text-red-400">Lakefront logistical constraints</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Snapshot (P&L / BS Teaser) -->
+                <div class="glass-panel p-6 rounded-xl shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold">Core Financials Snapshot</h2>
+                        <button class="text-xs text-gold-500 hover:text-gold-400 transition">View Full Ledger →</button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-gray-800/60 p-3 rounded border border-gray-700">
+                            <p class="text-xs text-gray-400 uppercase">Operating Revenue</p>
+                            <p class="text-xl font-bold text-white mt-1">€38.2M</p>
+                            <p class="text-xs text-green-400 mt-1">↑ +8% YoY</p>
+                        </div>
+                        <div class="bg-gray-800/60 p-3 rounded border border-gray-700">
+                            <p class="text-xs text-gray-400 uppercase">EBITDA</p>
+                            <p class="text-xl font-bold text-white mt-1">€4.1M</p>
+                            <p class="text-xs text-yellow-400 mt-1">Target: €5.0M</p>
+                        </div>
+                        <div class="bg-gray-800/60 p-3 rounded border border-gray-700">
+                            <p class="text-xs text-gray-400 uppercase">External Debt</p>
+                            <p class="text-xl font-bold text-white mt-1">€0.00</p>
+                            <p class="text-xs text-green-400 mt-1">✓ Equity Funded</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Executive Diary -->
-            <div class="glass-panel p-6 rounded-xl shadow-xl">
+            <!-- Right Column: Executive Diary -->
+            <div class="glass-panel p-6 rounded-xl shadow-xl h-full">
                 <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
                     <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     Daily Operations Diary
@@ -107,7 +161,7 @@
                         <div class="w-5 h-5 rounded-full bg-blue-500 border-4 border-gray-900 z-10 flex-shrink-0 mt-0.5"></div>
                         <div>
                             <p class="text-xs text-blue-400 font-bold">14:00 PM</p>
-                            <p class="text-sm font-medium">UEFA Squad Cost Rule Audit (Finance)</p>
+                            <p class="text-sm font-medium">Balance Sheet / P&L Monthly Close</p>
                         </div>
                     </div>
                     <div class="flex gap-3 items-start">
@@ -145,49 +199,32 @@
                 </div>
             </div>
 
-            <!-- KPIs -->
+            <!-- 4 Elite Executive KPIs -->
             <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-2">
-                
                 <!-- KPI 1 -->
                 <div class="glass-panel p-5 rounded-xl border-l-4 border-green-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
-                    <div class="absolute top-3 right-3 text-gray-500 group-hover:text-white transition">⚙️</div>
                     <h3 id="kpi-1-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">UEFA Squad Cost Rule</h3>
                     <div id="kpi-1-val" class="text-3xl font-bold text-white mb-1">68.4%</div>
-                    <p id="kpi-1-sub" class="text-xs text-green-400 font-semibold mt-2 bg-green-900/30 inline-block px-2 py-1 rounded">
-                        ✓ Compliant (< 70% Limit)
-                    </p>
+                    <p id="kpi-1-sub" class="text-xs text-green-400 font-semibold mt-2 bg-green-900/30 inline-block px-2 py-1 rounded">✓ Compliant (< 70% Limit)</p>
                 </div>
-
                 <!-- KPI 2 -->
                 <div class="glass-panel p-5 rounded-xl border-l-4 border-blue-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
-                    <div class="absolute top-3 right-3 text-gray-500 group-hover:text-white transition">⚙️</div>
                     <h3 id="kpi-2-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Non-Matchday Yield</h3>
                     <div id="kpi-2-val" class="text-3xl font-bold text-white mb-1">€4.2M</div>
-                    <p id="kpi-2-sub" class="text-xs text-blue-400 font-semibold mt-2 bg-blue-900/30 inline-block px-2 py-1 rounded">
-                        ↑ +12% Lifestyle Retail YoY
-                    </p>
+                    <p id="kpi-2-sub" class="text-xs text-blue-400 font-semibold mt-2 bg-blue-900/30 inline-block px-2 py-1 rounded">↑ +12% Lifestyle Retail</p>
                 </div>
-
-                <!-- KPI 3 -->
-                <div class="glass-panel p-5 rounded-xl border-l-4 border-red-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
-                    <div class="absolute top-3 right-3 text-gray-500 group-hover:text-white transition">⚠️</div>
-                    <h3 id="kpi-3-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Player Amortization</h3>
-                    <div id="kpi-3-val" class="text-3xl font-bold text-white mb-1">€18.5M</div>
-                    <p id="kpi-3-sub" class="text-xs text-red-400 font-semibold mt-2 bg-red-900/30 inline-block px-2 py-1 rounded">
-                        ⚠ ACTION: Review contract renewals
-                    </p>
+                <!-- KPI 3 (Asset ROI) -->
+                <div class="glass-panel p-5 rounded-xl border-l-4 border-gold-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
+                    <h3 id="kpi-3-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Net Asset ROI Variance</h3>
+                    <div id="kpi-3-val" class="text-3xl font-bold text-white mb-1">+24.5%</div>
+                    <p id="kpi-3-sub" class="text-xs text-gold-400 font-semibold mt-2 bg-yellow-900/30 inline-block px-2 py-1 rounded">Market Val > Book Val</p>
                 </div>
-
-                <!-- KPI 4 -->
-                <div class="glass-panel p-5 rounded-xl border-l-4 border-yellow-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
-                    <div class="absolute top-3 right-3 text-gray-500 group-hover:text-white transition">⚠️</div>
-                    <h3 id="kpi-4-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">CapEx Variance</h3>
-                    <div id="kpi-4-val" class="text-3xl font-bold text-white mb-1">€1.1M</div>
-                    <p id="kpi-4-sub" class="text-xs text-yellow-400 font-semibold mt-2 bg-yellow-900/30 inline-block px-2 py-1 rounded">
-                        ⚠ Over Budget (Hospitality Retrofit)
-                    </p>
+                <!-- KPI 4 (ESG) -->
+                <div class="glass-panel p-5 rounded-xl border-l-4 border-purple-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
+                    <h3 id="kpi-4-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">ESG Carbon Baseline</h3>
+                    <div id="kpi-4-val" class="text-3xl font-bold text-white mb-1">Tier 2</div>
+                    <p id="kpi-4-sub" class="text-xs text-purple-400 font-semibold mt-2 bg-purple-900/30 inline-block px-2 py-1 rounded">Stadio Design Compliant</p>
                 </div>
-
             </div>
         </div>
     </div>
@@ -197,13 +234,13 @@
             'como': {
                 bg: 'https://images.unsplash.com/photo-1542359649-31e03cd4d909?q=80&w=2000&auto=format&fit=crop',
                 header: 'Como 1907 Proxy',
-                briefing: 'Stadio Giuseppe Sinigaglia DOCFAP (Feasibility) phase is entering critical review with Populous. Lifestyle apparel margins via Adidas production freedoms are offsetting standard matchday limitations. Ensure Villa Carminati hospitality structural plans align with Phase 1 rollout.',
+                briefing: 'Stadio Giuseppe Sinigaglia DOCFAP phase is in critical review. Lifestyle apparel margins via Adidas offset matchday limitations. Ensure Villa Carminati hospitality structural plans align with Phase 1 rollout.',
                 obj: 'Secure DOCFAP Approval by May 2026',
                 risk: 'Lakefront logistical constraints',
-                kpi1: { title: 'UEFA Squad Cost Rule', val: '68.4%', sub: '✓ Compliant (< 70% Limit)', color: 'green' },
-                kpi2: { title: 'Non-Matchday Yield', val: '€4.2M', sub: '↑ +12% Lifestyle Retail YoY', color: 'blue' },
-                kpi3: { title: 'Player Amortization', val: '€18.5M', sub: '⚠ ACTION: Review contract renewals', color: 'red' },
-                kpi4: { title: 'CapEx Variance', val: '€1.1M', sub: '⚠ Over Budget (Hospitality)', color: 'yellow' },
+                kpi1: { title: 'UEFA Squad Cost Rule', val: '68.4%', sub: '✓ Compliant (< 70% Limit)' },
+                kpi2: { title: 'Non-Matchday Yield', val: '€4.2M', sub: '↑ +12% Lifestyle Retail YoY' },
+                kpi3: { title: 'Net Asset ROI Variance', val: '+24.5%', sub: 'Market Val > Book Val' },
+                kpi4: { title: 'ESG Carbon Baseline', val: 'Tier 2', sub: 'Stadio Design Compliant' },
                 tickets: `
                     <tr class="border-b border-gray-600/30 hover:bg-gray-700/40 transition">
                         <td class="py-3 px-3 text-blue-400 font-mono text-xs">CMO-812</td>
@@ -229,10 +266,10 @@
                 briefing: 'Bernabéu operations transitioning to full 365-day monetization. Concert scheduling conflicts with pitch retraction timeline. Sixth Street partnership distributions require quarterly audit mapping against UEFA FSR regulations.',
                 obj: 'Maximize Bernabéu 365 Event Days',
                 risk: 'Pitch retraction mechanical delay',
-                kpi1: { title: 'UEFA Squad Cost Rule', val: '54.2%', sub: '✓ High Headroom Available', color: 'green' },
-                kpi2: { title: 'Bernabéu Event Yield', val: '€18.4M', sub: '↑ +40% (Taylor Swift / NFL)', color: 'blue' },
-                kpi3: { title: 'Debt Servicing', val: '€35.0M', sub: '✓ Fixed Rate Institutional', color: 'green' },
-                kpi4: { title: 'Squad Valuation (Market)', val: '€1.2B', sub: '↑ +5% (Mbappé Integration)', color: 'blue' },
+                kpi1: { title: 'UEFA Squad Cost Rule', val: '54.2%', sub: '✓ High Headroom Available' },
+                kpi2: { title: 'Bernabéu Event Yield', val: '€18.4M', sub: '↑ +40% (Taylor Swift / NFL)' },
+                kpi3: { title: 'Net Asset ROI Variance', val: '+45.0%', sub: 'Driven by Academy Grads' },
+                kpi4: { title: 'ESG Carbon Baseline', val: 'Tier 1', sub: 'Renewable Power Active' },
                 tickets: `
                     <tr class="border-b border-gray-600/30 hover:bg-gray-700/40 transition">
                         <td class="py-3 px-3 text-blue-400 font-mono text-xs">MAD-102</td>
@@ -246,20 +283,7 @@
             }
         };
 
-        // Fallback simple ticket data for others
-        const genericTickets = `
-            <tr class="border-b border-gray-600/30 hover:bg-gray-700/40 transition">
-                <td class="py-3 px-3 text-blue-400 font-mono text-xs">GEN-001</td>
-                <td class="py-3 px-3"><span class="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded">P2 - Normal</span></td>
-                <td class="py-3 px-3 text-gray-200">Standard Operations Review</td>
-                <td class="py-3 px-3 text-gray-400">Management</td>
-                <td class="py-3 px-3">Pending Executive Assignment</td>
-                <td class="py-3 px-3"><span class="text-gray-400 text-xs font-semibold">BACKLOG</span></td>
-            </tr>
-        `;
-
         function switchTeam(teamKey) {
-            // Update buttons
             document.querySelectorAll('.team-btn').forEach(btn => {
                 btn.classList.remove('bg-gray-700', 'text-white');
                 btn.classList.add('text-gray-400');
@@ -268,19 +292,8 @@
             activeBtn.classList.remove('text-gray-400');
             activeBtn.classList.add('bg-gray-700', 'text-white');
 
-            const data = dataStore[teamKey] || {
-                bg: 'https://images.unsplash.com/photo-1508344928928-7137b29339d0?q=80&w=2000&auto=format&fit=crop',
-                header: teamKey.toUpperCase() + ' Proxy',
-                briefing: 'Awaiting strategic data ingestion for this entity. Connect Python/Alteryx pipeline to populate live metrics.',
-                obj: 'Establish Data Pipeline', risk: 'N/A',
-                kpi1: { title: 'Metric 1', val: '---', sub: 'Pending', color: 'gray' },
-                kpi2: { title: 'Metric 2', val: '---', sub: 'Pending', color: 'gray' },
-                kpi3: { title: 'Metric 3', val: '---', sub: 'Pending', color: 'gray' },
-                kpi4: { title: 'Metric 4', val: '---', sub: 'Pending', color: 'gray' },
-                tickets: genericTickets
-            };
+            const data = dataStore[teamKey] || dataStore['como']; 
 
-            // Update DOM
             document.getElementById('app-body').style.backgroundImage = `url('${data.bg}')`;
             document.getElementById('team-name-header').innerText = data.header;
             document.getElementById('briefing-text').innerText = data.briefing;
@@ -295,8 +308,8 @@
                 document.getElementById(`kpi-${i}-sub`).innerText = kpi.sub;
             }
         }
-
-        // Initialize default view
+        
+        // Init
         switchTeam('como');
     </script>
 </body>
