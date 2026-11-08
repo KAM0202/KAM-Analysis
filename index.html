@@ -4,413 +4,300 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KAM GM Intelligence Workspace v4.0</title>
-    
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        gold: '#d4af37',
-                        emerald: '#10b981',
-                        crimson: '#ef4444',
-                        sapphire: '#3b82f6',
-                        glass: {
-                            100: 'rgba(255, 255, 255, 0.1)',
-                            200: 'rgba(17, 24, 39, 0.7)', // Dark glass
-                            300: 'rgba(17, 24, 39, 0.85)', // Darker glass
-                        }
+                        gray: { 800: '#1f2937', 900: '#111827' },
+                        gold: { 500: '#d4af37' }
                     }
                 }
             }
         }
     </script>
-
     <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.8); }
-        
-        /* Checkbox Styling */
-        .jira-checkbox {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 4px;
-            background: rgba(0,0,0,0.2);
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-        .jira-checkbox:checked {
-            background: #10b981;
-            border-color: #10b981;
-        }
-        .jira-checkbox:checked::after {
-            content: '✓';
-            position: absolute;
-            color: white;
-            font-size: 12px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Glass Panel Utility */
+        /* Glassmorphism utility classes */
         .glass-panel {
-            background: var(--tw-colors-glass-200);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background-image 0.5s ease-in-out;
         }
     </style>
 </head>
-<body class="text-white font-sans antialiased overflow-hidden h-screen w-screen relative">
-
-    <!-- Dynamic Background Layer -->
-    <div id="bg-image" class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out z-0 scale-105" style="background-image: url('https://images.unsplash.com/photo-1518091043644-c1d44570a2c9?auto=format&fit=crop&w=1920&q=80');"></div>
-    <!-- Heavy Dark Overlay for Readability -->
-    <div class="absolute inset-0 bg-gray-950/85 backdrop-blur-[8px] z-0"></div>
-
-    <!-- Main Application Wrapper -->
-    <div class="relative z-10 flex flex-col h-full overflow-hidden">
+<body id="app-body" class="text-white font-sans antialiased min-h-screen bg-gray-900" style="background-image: url('https://images.unsplash.com/photo-1542359649-31e03cd4d909?q=80&w=2000&auto=format&fit=crop');">
+    
+    <!-- Heavy Overlay to ensure text readability -->
+    <div class="min-h-screen bg-black/60 pb-10">
         
-        <!-- Header Nav -->
-        <header class="h-16 glass-panel border-b-0 flex items-center justify-between px-6 shrink-0 z-20">
-            <div class="flex items-center space-x-6">
-                <!-- Team Logo & Selector -->
-                <div class="flex items-center bg-black/40 border border-white/10 rounded-lg p-1.5 hover:border-gold/50 transition-colors cursor-pointer group">
-                    <img id="header-logo" src="https://ui-avatars.com/api/?name=C+19&background=d4af37&color=111827&bold=true" alt="Logo" class="w-8 h-8 rounded bg-gold">
-                    <select id="franchise-selector" class="bg-transparent text-sm font-bold tracking-wider text-white focus:outline-none appearance-none px-3 pr-8 cursor-pointer uppercase" onchange="updateDashboard(this.value)">
-                        <option value="como">Como 1907 (Proxy)</option>
-                        <option value="real_madrid">Real Madrid CF</option>
-                        <option value="man_utd">Manchester United</option>
-                        <option value="gsw">Golden State Warriors</option>
-                        <option value="bengals">Cincinnati Bengals</option>
-                    </select>
-                    <i class="ph ph-caret-down absolute right-4 text-gray-400 pointer-events-none group-hover:text-gold"></i>
+        <!-- Header & Franchise Toggle -->
+        <header class="glass-panel sticky top-0 z-50 border-b border-gray-700 p-4 mb-6 shadow-2xl">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-100 tracking-tight">Executive Operations Command</h1>
+                    <p class="text-sm text-gray-300">KAM GM Intelligence Workspace | <span id="team-name-header" class="text-gold-500 font-semibold">Como 1907 Proxy</span></p>
                 </div>
-                
-                <h1 class="text-xl font-light tracking-widest hidden md:block border-l border-white/20 pl-6 text-gray-300">
-                    KAM <span class="font-bold text-white">INTELLIGENCE</span> <span class="text-gold text-xs align-top">v4.0</span>
-                </h1>
-            </div>
-            
-            <div class="flex items-center space-x-4">
-                <span class="bg-emerald/20 text-emerald border border-emerald/30 py-1 px-3 rounded text-[10px] font-bold tracking-widest uppercase flex items-center shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                    <i class="ph ph-plugs-connected mr-1 text-sm"></i> Live Feed
-                </span>
-                <button class="text-gray-400 hover:text-white relative">
-                    <i class="ph ph-bell text-xl"></i>
-                    <span class="absolute -top-1 -right-1 h-2.5 w-2.5 bg-crimson rounded-full border border-gray-900 animate-pulse"></span>
-                </button>
-                <div class="h-8 w-8 rounded-full border border-white/20 overflow-hidden ml-2 cursor-pointer">
-                    <img src="https://ui-avatars.com/api/?name=GM&background=1f2937&color=fff" alt="GM">
+                <div class="flex gap-2 bg-black/50 p-1 rounded-lg border border-gray-600">
+                    <button onclick="switchTeam('como')" id="btn-como" class="team-btn px-4 py-2 text-sm font-semibold rounded bg-gray-700 text-white transition">Como 1907</button>
+                    <button onclick="switchTeam('rm')" id="btn-rm" class="team-btn px-4 py-2 text-sm font-semibold rounded hover:bg-gray-700 text-gray-400 transition">Real Madrid</button>
+                    <button onclick="switchTeam('mu')" id="btn-mu" class="team-btn px-4 py-2 text-sm font-semibold rounded hover:bg-gray-700 text-gray-400 transition">Man Utd</button>
+                    <button onclick="switchTeam('gsw')" id="btn-gsw" class="team-btn px-4 py-2 text-sm font-semibold rounded hover:bg-gray-700 text-gray-400 transition">GSW</button>
+                    <button onclick="switchTeam('cin')" id="btn-cin" class="team-btn px-4 py-2 text-sm font-semibold rounded hover:bg-gray-700 text-gray-400 transition">Bengals</button>
                 </div>
             </div>
         </header>
 
-        <!-- Scrollable Canvas -->
-        <main class="flex-1 overflow-y-auto p-6 scroll-smooth">
-            <div class="max-w-7xl mx-auto space-y-6">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Strategic AI Briefing -->
+            <div class="lg:col-span-2 glass-panel p-6 rounded-xl shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <svg class="w-5 h-5 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Strategic AI Briefing
+                    </h2>
+                    <span class="bg-blue-900/80 text-blue-300 text-xs px-2 py-1 rounded border border-blue-700">Updated 08:00 AM</span>
+                </div>
+                <p id="briefing-text" class="text-gray-200 leading-relaxed text-sm mb-4">
+                    Stadio Giuseppe Sinigaglia DOCFAP (Feasibility) phase is entering critical review with Populous. Lifestyle apparel margins via Adidas production freedoms are offsetting standard matchday limitations. Ensure Villa Carminati hospitality structural plans align with Phase 1 rollout.
+                </p>
+                <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-600/50">
+                    <div>
+                        <h4 class="text-xs text-gray-400 uppercase tracking-wide mb-1">Primary Objective</h4>
+                        <p id="objective-text" class="text-sm font-semibold text-green-400">Secure DOCFAP Approval by May 2026</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xs text-gray-400 uppercase tracking-wide mb-1">Risk Vector</h4>
+                        <p id="risk-text" class="text-sm font-semibold text-red-400">Lakefront logistical constraints</p>
+                    </div>
+                </div>
+            </div>
 
-                <!-- SECTION 1: THE COMMAND CENTER (Inverted Layout Top) -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Left: Strategic AI Briefing -->
-                    <div class="col-span-1 glass-panel rounded-xl p-6 relative overflow-hidden flex flex-col">
-                        <div class="absolute -right-6 -top-6 opacity-5 pointer-events-none">
-                            <i class="ph-fill ph-brain text-[150px] text-white"></i>
+            <!-- Executive Diary -->
+            <div class="glass-panel p-6 rounded-xl shadow-xl">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Daily Operations Diary
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex gap-3 items-start relative before:absolute before:left-2.5 before:top-6 before:bottom-[-16px] before:w-0.5 before:bg-gray-600">
+                        <div class="w-5 h-5 rounded-full bg-green-500 border-4 border-gray-900 z-10 flex-shrink-0 mt-0.5"></div>
+                        <div>
+                            <p class="text-xs text-green-400 font-bold">08:30 AM</p>
+                            <p class="text-sm font-medium">GM / COO Operational Alignment</p>
                         </div>
-                        <h2 class="text-xs font-bold text-gold uppercase tracking-widest mb-4 flex items-center border-b border-white/10 pb-2">
-                            <i class="ph-fill ph-sparkle mr-2 text-lg"></i> Executive Briefing
-                        </h2>
-                        
-                        <div id="briefing-content" class="flex-1 space-y-4 text-sm text-gray-300 relative z-10 leading-relaxed">
+                    </div>
+                    <div class="flex gap-3 items-start relative before:absolute before:left-2.5 before:top-6 before:bottom-[-16px] before:w-0.5 before:bg-gray-600">
+                        <div class="w-5 h-5 rounded-full bg-gold-500 border-4 border-gray-900 z-10 flex-shrink-0 mt-0.5"></div>
+                        <div>
+                            <p class="text-xs text-gold-500 font-bold">11:00 AM</p>
+                            <p class="text-sm font-medium">Populous Stadium Architecture Review</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start relative before:absolute before:left-2.5 before:top-6 before:bottom-[-16px] before:w-0.5 before:bg-gray-600">
+                        <div class="w-5 h-5 rounded-full bg-blue-500 border-4 border-gray-900 z-10 flex-shrink-0 mt-0.5"></div>
+                        <div>
+                            <p class="text-xs text-blue-400 font-bold">14:00 PM</p>
+                            <p class="text-sm font-medium">UEFA Squad Cost Rule Audit (Finance)</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start">
+                        <div class="w-5 h-5 rounded-full bg-purple-500 border-4 border-gray-900 z-10 flex-shrink-0 mt-0.5"></div>
+                        <div>
+                            <p class="text-xs text-purple-400 font-bold">16:30 PM</p>
+                            <p class="text-sm font-medium">Adidas Lifestyle Supply Chain Check</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jira-Style Action & Risk Register -->
+            <div class="lg:col-span-3 glass-panel p-6 rounded-xl shadow-xl mt-2">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-600/50 pb-2">
+                    <h2 class="text-xl font-bold">Action & Risk Register</h2>
+                    <button class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded transition">+ New Ticket</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="text-gray-400 text-xs uppercase tracking-wider">
+                                <th class="py-3 px-3">Ticket</th>
+                                <th class="py-3 px-3">Priority</th>
+                                <th class="py-3 px-3">Initiative</th>
+                                <th class="py-3 px-3">Department</th>
+                                <th class="py-3 px-3">Assignee / Next Step</th>
+                                <th class="py-3 px-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticket-body" class="text-sm">
                             <!-- Populated by JS -->
-                        </div>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                        <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center text-xs text-gray-500">
-                            <span>Generated: Today, 08:00 AM</span>
-                            <button class="hover:text-white transition flex items-center"><i class="ph ph-arrows-clockwise mr-1"></i> Refresh</button>
-                        </div>
-                    </div>
-
-                    <!-- Right: Jira-Inspired Action Register -->
-                    <div class="col-span-1 lg:col-span-2 glass-panel rounded-xl flex flex-col overflow-hidden">
-                        <div class="p-5 border-b border-white/10 flex justify-between items-center bg-black/20">
-                            <div>
-                                <h2 class="text-xs font-bold text-white uppercase tracking-widest flex items-center">
-                                    <i class="ph-fill ph-kanban mr-2 text-sapphire text-lg"></i> Ops Risk & Action Register
-                                </h2>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button class="text-xs bg-white/5 hover:bg-white/10 text-white py-1.5 px-3 rounded transition-colors font-medium border border-white/10 flex items-center">
-                                    <i class="ph ph-funnel mr-1"></i> Filter
-                                </button>
-                                <button class="text-xs bg-sapphire/20 hover:bg-sapphire/30 text-sapphire py-1.5 px-3 rounded transition-colors font-medium border border-sapphire/30 flex items-center">
-                                    <i class="ph ph-plus mr-1"></i> New Epic
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="flex-1 overflow-x-auto">
-                            <table class="w-full text-left border-collapse min-w-[600px]">
-                                <thead>
-                                    <tr class="text-gray-400 text-[10px] uppercase tracking-wider border-b border-white/10 bg-black/10">
-                                        <th class="py-3 px-4 w-10 text-center"><i class="ph ph-check-square"></i></th>
-                                        <th class="py-3 px-4">Priority</th>
-                                        <th class="py-3 px-4">Action Item / Epic</th>
-                                        <th class="py-3 px-4 text-center">Status</th>
-                                        <th class="py-3 px-4 text-center">Assignee</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="actions-tbody" class="text-sm">
-                                    <!-- Populated by JS -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
+            <!-- KPIs -->
+            <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-2">
+                
+                <!-- KPI 1 -->
+                <div class="glass-panel p-5 rounded-xl border-l-4 border-green-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
+                    <div class="absolute top-3 right-3 text-gray-500 group-hover:text-white transition">⚙️</div>
+                    <h3 id="kpi-1-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">UEFA Squad Cost Rule</h3>
+                    <div id="kpi-1-val" class="text-3xl font-bold text-white mb-1">68.4%</div>
+                    <p id="kpi-1-sub" class="text-xs text-green-400 font-semibold mt-2 bg-green-900/30 inline-block px-2 py-1 rounded">
+                        ✓ Compliant (< 70% Limit)
+                    </p>
                 </div>
 
-                <!-- SECTION 2: KEY PERFORMANCE INDICATORS (Bottom Row) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="kpi-container">
-                    
-                    <!-- KPI Cards Template (Duplicated 4x for structure, populated by JS) -->
-                    <div class="glass-panel p-5 rounded-xl border-l-4 border-l-emerald hover:bg-white/[0.02] transition-all duration-300 relative group">
-                        <div class="flex justify-between items-start mb-1">
-                            <h3 id="kpi1-title" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">Metric 1</h3>
-                            <i class="ph ph-dots-three text-gray-500 hover:text-white cursor-pointer"></i>
-                        </div>
-                        <div class="flex items-end space-x-2 mb-3">
-                            <div id="kpi1-value" class="text-3xl font-light text-white tracking-tight">0.0</div>
-                        </div>
-                        <div class="bg-black/30 rounded p-2 text-xs flex items-start border border-white/5">
-                            <i id="kpi1-icon" class="ph-fill ph-info text-emerald mr-1.5 mt-0.5 shrink-0"></i>
-                            <span id="kpi1-status" class="text-gray-300 font-medium">Status text</span>
-                        </div>
-                    </div>
-                    
-                    <div class="glass-panel p-5 rounded-xl border-l-4 border-l-emerald hover:bg-white/[0.02] transition-all duration-300 relative group">
-                        <div class="flex justify-between items-start mb-1">
-                            <h3 id="kpi2-title" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">Metric 2</h3>
-                            <i class="ph ph-dots-three text-gray-500 hover:text-white cursor-pointer"></i>
-                        </div>
-                        <div class="flex items-end space-x-2 mb-3">
-                            <div id="kpi2-value" class="text-3xl font-light text-white tracking-tight">0.0</div>
-                        </div>
-                        <div class="bg-black/30 rounded p-2 text-xs flex items-start border border-white/5">
-                            <i id="kpi2-icon" class="ph-fill ph-info text-emerald mr-1.5 mt-0.5 shrink-0"></i>
-                            <span id="kpi2-status" class="text-gray-300 font-medium">Status text</span>
-                        </div>
-                    </div>
+                <!-- KPI 2 -->
+                <div class="glass-panel p-5 rounded-xl border-l-4 border-blue-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
+                    <div class="absolute top-3 right-3 text-gray-500 group-hover:text-white transition">⚙️</div>
+                    <h3 id="kpi-2-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Non-Matchday Yield</h3>
+                    <div id="kpi-2-val" class="text-3xl font-bold text-white mb-1">€4.2M</div>
+                    <p id="kpi-2-sub" class="text-xs text-blue-400 font-semibold mt-2 bg-blue-900/30 inline-block px-2 py-1 rounded">
+                        ↑ +12% Lifestyle Retail YoY
+                    </p>
+                </div>
 
-                    <div class="glass-panel p-5 rounded-xl border-l-4 border-l-crimson hover:bg-white/[0.02] transition-all duration-300 relative group">
-                        <div class="flex justify-between items-start mb-1">
-                            <h3 id="kpi3-title" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">Metric 3</h3>
-                            <i class="ph ph-dots-three text-gray-500 hover:text-white cursor-pointer"></i>
-                        </div>
-                        <div class="flex items-end space-x-2 mb-3">
-                            <div id="kpi3-value" class="text-3xl font-light text-white tracking-tight">0.0</div>
-                        </div>
-                        <div class="bg-black/30 rounded p-2 text-xs flex items-start border border-white/5">
-                            <i id="kpi3-icon" class="ph-fill ph-warning-circle text-crimson mr-1.5 mt-0.5 shrink-0 animate-pulse"></i>
-                            <span id="kpi3-status" class="text-gray-300 font-medium">Status text</span>
-                        </div>
-                    </div>
+                <!-- KPI 3 -->
+                <div class="glass-panel p-5 rounded-xl border-l-4 border-red-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
+                    <div class="absolute top-3 right-3 text-gray-500 group-hover:text-white transition">⚠️</div>
+                    <h3 id="kpi-3-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">Player Amortization</h3>
+                    <div id="kpi-3-val" class="text-3xl font-bold text-white mb-1">€18.5M</div>
+                    <p id="kpi-3-sub" class="text-xs text-red-400 font-semibold mt-2 bg-red-900/30 inline-block px-2 py-1 rounded">
+                        ⚠ ACTION: Review contract renewals
+                    </p>
+                </div>
 
-                    <div class="glass-panel p-5 rounded-xl border-l-4 border-l-gold hover:bg-white/[0.02] transition-all duration-300 relative group">
-                        <div class="flex justify-between items-start mb-1">
-                            <h3 id="kpi4-title" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">Metric 4</h3>
-                            <i class="ph ph-dots-three text-gray-500 hover:text-white cursor-pointer"></i>
-                        </div>
-                        <div class="flex items-end space-x-2 mb-3">
-                            <div id="kpi4-value" class="text-3xl font-light text-white tracking-tight">0.0</div>
-                        </div>
-                        <div class="bg-black/30 rounded p-2 text-xs flex items-start border border-white/5">
-                            <i id="kpi4-icon" class="ph-fill ph-warning text-gold mr-1.5 mt-0.5 shrink-0"></i>
-                            <span id="kpi4-status" class="text-gray-300 font-medium">Status text</span>
-                        </div>
-                    </div>
-
+                <!-- KPI 4 -->
+                <div class="glass-panel p-5 rounded-xl border-l-4 border-yellow-500 relative group cursor-pointer hover:bg-gray-800/80 transition">
+                    <div class="absolute top-3 right-3 text-gray-500 group-hover:text-white transition">⚠️</div>
+                    <h3 id="kpi-4-title" class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">CapEx Variance</h3>
+                    <div id="kpi-4-val" class="text-3xl font-bold text-white mb-1">€1.1M</div>
+                    <p id="kpi-4-sub" class="text-xs text-yellow-400 font-semibold mt-2 bg-yellow-900/30 inline-block px-2 py-1 rounded">
+                        ⚠ Over Budget (Hospitality Retrofit)
+                    </p>
                 </div>
 
             </div>
-        </main>
+        </div>
     </div>
 
     <script>
-        // --- Data Definitions ---
-        const franchiseData = {
-            como: {
-                bgImage: 'https://images.unsplash.com/photo-1559564484-e48b3e040ff4?auto=format&fit=crop&w=1920&q=80', // Lake Como vibe
-                logoInitials: 'C+19', logoColor: 'd4af37',
-                briefing: [
-                    "<b>Immediate Focus:</b> We must neutralize the sudden jump in Player Amortization caused by the January window.",
-                    "<b>Commercial Ops:</b> Review the Hospitality Customer Journey mapping. CapEx for the VIP retrofit is drifting +2.4% over budget.",
-                    "<b>Football Ops:</b> The Academy Learning Environment Framework needs final sign-off to secure UEFA solidarity grants."
-                ],
-                kpi1: { title: 'UEFA Squad Cost Rule', val: '68.4%', status: 'Compliant. 1.6% buffer remains.', color: 'emerald', icon: 'ph-shield-check' },
-                kpi2: { title: 'Non-Matchday Yield', val: '€4.2M', status: '+12.4% vs Last Qtr. Retail driving growth.', color: 'emerald', icon: 'ph-trend-up' },
-                kpi3: { title: 'Player Amortization', val: '€18.5M', status: 'URGENT: +€2.1M Impact. Restructure needed.', color: 'crimson', icon: 'ph-warning-octagon' },
-                kpi4: { title: 'Stadium CapEx Variance', val: '€1.1M', status: '2.4% Over budget on VIP Hospitality.', color: 'gold', icon: 'ph-warning' },
-                actions: [
-                    { id: 'C19-101', priority: 'P0', prioColor: 'bg-crimson/20 text-crimson border-crimson/30', task: 'Restructure senior player contracts to flatten amortization curve for Jan window.', status: 'To Do', statusColor: 'bg-gray-800 text-gray-300', assignee: 'JD' },
-                    { id: 'C19-102', priority: 'P1', prioColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30', task: 'Hospitality Customer Journey Mapping - Audit Q3 VIP experiences and overrun.', status: 'In Progress', statusColor: 'bg-sapphire/20 text-sapphire', assignee: 'MK' },
-                    { id: 'C19-103', priority: 'P2', prioColor: 'bg-sapphire/20 text-sapphire border-sapphire/30', task: 'Academy Learning Environment Frameworks - Implement cognitive curriculum.', status: 'Review', statusColor: 'bg-purple-500/20 text-purple-400', assignee: 'FO' }
-                ]
+        const dataStore = {
+            'como': {
+                bg: 'https://images.unsplash.com/photo-1542359649-31e03cd4d909?q=80&w=2000&auto=format&fit=crop',
+                header: 'Como 1907 Proxy',
+                briefing: 'Stadio Giuseppe Sinigaglia DOCFAP (Feasibility) phase is entering critical review with Populous. Lifestyle apparel margins via Adidas production freedoms are offsetting standard matchday limitations. Ensure Villa Carminati hospitality structural plans align with Phase 1 rollout.',
+                obj: 'Secure DOCFAP Approval by May 2026',
+                risk: 'Lakefront logistical constraints',
+                kpi1: { title: 'UEFA Squad Cost Rule', val: '68.4%', sub: '✓ Compliant (< 70% Limit)', color: 'green' },
+                kpi2: { title: 'Non-Matchday Yield', val: '€4.2M', sub: '↑ +12% Lifestyle Retail YoY', color: 'blue' },
+                kpi3: { title: 'Player Amortization', val: '€18.5M', sub: '⚠ ACTION: Review contract renewals', color: 'red' },
+                kpi4: { title: 'CapEx Variance', val: '€1.1M', sub: '⚠ Over Budget (Hospitality)', color: 'yellow' },
+                tickets: `
+                    <tr class="border-b border-gray-600/30 hover:bg-gray-700/40 transition">
+                        <td class="py-3 px-3 text-blue-400 font-mono text-xs">CMO-812</td>
+                        <td class="py-3 px-3"><span class="bg-red-900/80 text-red-300 text-xs px-2 py-1 rounded border border-red-700">P0 - Blocked</span></td>
+                        <td class="py-3 px-3 text-gray-200">Stadio DOCFAP Council Submission</td>
+                        <td class="py-3 px-3 text-gray-400">Infrastructure</td>
+                        <td class="py-3 px-3">Legal / Awaiting Mayor Signoff</td>
+                        <td class="py-3 px-3"><span class="text-yellow-400 text-xs font-semibold">IN PROGRESS</span></td>
+                    </tr>
+                    <tr class="border-b border-gray-600/30 hover:bg-gray-700/40 transition">
+                        <td class="py-3 px-3 text-blue-400 font-mono text-xs">CMO-814</td>
+                        <td class="py-3 px-3"><span class="bg-yellow-900/80 text-yellow-300 text-xs px-2 py-1 rounded border border-yellow-700">P1 - High</span></td>
+                        <td class="py-3 px-3 text-gray-200">Adidas Capsule Collection Pricing</td>
+                        <td class="py-3 px-3 text-gray-400">Commercial / Retail</td>
+                        <td class="py-3 px-3">Brand Dept / Finalize Margins</td>
+                        <td class="py-3 px-3"><span class="text-blue-400 text-xs font-semibold">REVIEW</span></td>
+                    </tr>
+                `
             },
-            real_madrid: {
-                bgImage: 'https://images.unsplash.com/photo-1543351611-58f69d7c1781?auto=format&fit=crop&w=1920&q=80', // Bernabeu / Madrid vibe
-                logoInitials: 'RMA', logoColor: '3b82f6',
-                briefing: [
-                    "<b>Commercial Ops:</b> Global revenues masking summer transfer amortization. Yields are highly positive.",
-                    "<b>Infrastructure:</b> Executive focus must shift to the Bernabéu financing restructure.",
-                    "<b>Risk:</b> The Skybar handover delay is blocking €45M in projected Q2 yield. Penalties apply."
-                ],
-                kpi1: { title: 'UEFA Squad Cost Rule', val: '54.2%', status: 'Highly Compliant. Massive headroom.', color: 'emerald', icon: 'ph-shield-check' },
-                kpi2: { title: 'Commercial Yield', val: '€380M', status: '+15.2% driven by global sponsors.', color: 'emerald', icon: 'ph-trend-up' },
-                kpi3: { title: 'Player Amortization', val: '€145M', status: 'Expected spike from summer window.', color: 'gold', icon: 'ph-info' },
-                kpi4: { title: 'Bernabéu CapEx Var', val: '€120M', status: 'Skybar delayed. Trigger penalty clauses.', color: 'crimson', icon: 'ph-warning-octagon' },
-                actions: [
-                    { id: 'RMA-405', priority: 'P0', prioColor: 'bg-crimson/20 text-crimson border-crimson/30', task: 'Trigger late-delivery penalty clauses for Bernabéu VIP Skybar.', status: 'Blocked', statusColor: 'bg-crimson/20 text-crimson', assignee: 'LG' },
-                    { id: 'RMA-406', priority: 'P1', prioColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30', task: 'Draft Naming Rights RFI for Valdebebas Training Complex.', status: 'In Progress', statusColor: 'bg-sapphire/20 text-sapphire', assignee: 'CM' }
-                ]
-            },
-            man_utd: {
-                bgImage: 'https://images.unsplash.com/photo-1623223049281-2dd3dbfa777c?auto=format&fit=crop&w=1920&q=80', // Manchester/Old Trafford vibe
-                logoInitials: 'MUN', logoColor: 'ef4444',
-                briefing: [
-                    "<b>Governance:</b> Critical UEFA Squad Cost rule breach risk at 76.5%.",
-                    "<b>Immediate Action:</b> Offload non-core squad assets to normalize wage-to-revenue ratio before FY end.",
-                    "<b>Strategy:</b> Old Trafford Regeneration Task Force needs viability modeling signed off by INEOS."
-                ],
-                kpi1: { title: 'UEFA Squad Cost Rule', val: '76.5%', status: 'CRITICAL: Breach Risk. Over 70% Limit.', color: 'crimson', icon: 'ph-warning-octagon' },
-                kpi2: { title: 'Commercial Yield', val: '€315M', status: '-2.1% Sponsor Attrition.', color: 'gold', icon: 'ph-trend-down' },
-                kpi3: { title: 'Player Amortization', val: '€170M', status: 'High burden from legacy contracts.', color: 'crimson', icon: 'ph-users-three' },
-                kpi4: { title: 'Old Trafford CapEx', val: '€500M', status: 'Task Force Phase 1 projections active.', color: 'sapphire', icon: 'ph-crane' },
-                actions: [
-                    { id: 'MUN-902', priority: 'P0', prioColor: 'bg-crimson/20 text-crimson border-crimson/30', task: 'Execute player sales/loans to reduce UEFA Squad Cost ratio below 70%.', status: 'In Progress', statusColor: 'bg-sapphire/20 text-sapphire', assignee: 'FO' },
-                    { id: 'MUN-903', priority: 'P1', prioColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30', task: 'Submit Phase 1 stadium regeneration financial models to INEOS.', status: 'Review', statusColor: 'bg-purple-500/20 text-purple-400', assignee: 'ST' }
-                ]
-            },
-            gsw: {
-                bgImage: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=1920&q=80', // SF vibe
-                logoInitials: 'GSW', logoColor: 'f59e0b',
-                briefing: [
-                    "<b>Cap Constraints:</b> Exceeding 2nd Apron luxury tax restricts teambuilding. Model trades to duck tax.",
-                    "<b>Real Estate:</b> Chase Center remains a fortress. Thrive City retail expansion is ahead of schedule.",
-                    "<b>Analytics:</b> Run Monte Carlo simulations on trade impacts vs luxury tax brackets."
-                ],
-                kpi1: { title: 'NBA Luxury Tax Tier', val: '$210M', status: '2nd Apron Exceeded. Restricts trades.', color: 'crimson', icon: 'ph-warning-octagon' },
-                kpi2: { title: 'Chase Center Yield', val: '$125M', status: '+18.4% YoY from non-NBA events.', color: 'emerald', icon: 'ph-trend-up' },
-                kpi3: { title: 'Dead Cap & Buyouts', val: '$15.2M', status: 'Manageable waived player impact.', color: 'emerald', icon: 'ph-check-circle' },
-                kpi4: { title: 'Facility CapEx', val: '$2.4M', status: 'Practice court upgrades complete.', color: 'emerald', icon: 'ph-check-circle' },
-                actions: [
-                    { id: 'GSW-22', priority: 'P1', prioColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30', task: 'Run Monte Carlo simulations on trade impacts vs luxury tax brackets.', status: 'In Progress', statusColor: 'bg-sapphire/20 text-sapphire', assignee: 'DA' },
-                    { id: 'GSW-23', priority: 'P2', prioColor: 'bg-sapphire/20 text-sapphire border-sapphire/30', task: 'Finalize vendor approvals for Thrive City retail expansion phase 2.', status: 'To Do', statusColor: 'bg-gray-800 text-gray-300', assignee: 'RE' }
-                ]
-            },
-            bengals: {
-                bgImage: 'https://images.unsplash.com/photo-1582236316719-798864786445?auto=format&fit=crop&w=1920&q=80', // Football stadium vibe
-                logoInitials: 'CIN', logoColor: 'f97316',
-                briefing: [
-                    "<b>Cap Health:</b> Pristine space, positioned perfectly for upcoming mega-extensions (Chase/Higgins).",
-                    "<b>Infrastructure:</b> Priority is securing final county sign-offs for Paycor Stadium public-private funding.",
-                    "<b>Risk:</b> Missing the legislative window delays the seating overhaul to 2028."
-                ],
-                kpi1: { title: 'NFL Cap Space', val: '$45.2M', status: 'Healthy. Prep for extensions.', color: 'emerald', icon: 'ph-check-circle' },
-                kpi2: { title: 'Sponsorship Yield', val: '$35M', status: '+4.1% via new Naming Rights.', color: 'emerald', icon: 'ph-trend-up' },
-                kpi3: { title: 'Dead Money', val: '$8.5M', status: 'Minimal roster impact.', color: 'emerald', icon: 'ph-check-circle' },
-                kpi4: { title: 'Paycor CapEx', val: '$12M', status: 'Pending County Council approval.', color: 'gold', icon: 'ph-warning' },
-                actions: [
-                    { id: 'CIN-04', priority: 'P0', prioColor: 'bg-crimson/20 text-crimson border-crimson/30', task: 'Secure county council final vote for stadium modernization public funds.', status: 'Blocked', statusColor: 'bg-crimson/20 text-crimson', assignee: 'GR' },
-                    { id: 'CIN-05', priority: 'P1', prioColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30', task: 'Structure Ja\'Marr Chase extension models (Cash vs Cap impacts).', status: 'To Do', statusColor: 'bg-gray-800 text-gray-300', assignee: 'FA' }
-                ]
+            'rm': {
+                bg: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?q=80&w=2000&auto=format&fit=crop',
+                header: 'Real Madrid Proxy',
+                briefing: 'Bernabéu operations transitioning to full 365-day monetization. Concert scheduling conflicts with pitch retraction timeline. Sixth Street partnership distributions require quarterly audit mapping against UEFA FSR regulations.',
+                obj: 'Maximize Bernabéu 365 Event Days',
+                risk: 'Pitch retraction mechanical delay',
+                kpi1: { title: 'UEFA Squad Cost Rule', val: '54.2%', sub: '✓ High Headroom Available', color: 'green' },
+                kpi2: { title: 'Bernabéu Event Yield', val: '€18.4M', sub: '↑ +40% (Taylor Swift / NFL)', color: 'blue' },
+                kpi3: { title: 'Debt Servicing', val: '€35.0M', sub: '✓ Fixed Rate Institutional', color: 'green' },
+                kpi4: { title: 'Squad Valuation (Market)', val: '€1.2B', sub: '↑ +5% (Mbappé Integration)', color: 'blue' },
+                tickets: `
+                    <tr class="border-b border-gray-600/30 hover:bg-gray-700/40 transition">
+                        <td class="py-3 px-3 text-blue-400 font-mono text-xs">MAD-102</td>
+                        <td class="py-3 px-3"><span class="bg-red-900/80 text-red-300 text-xs px-2 py-1 rounded border border-red-700">P0 - Critical</span></td>
+                        <td class="py-3 px-3 text-gray-200">NFL International Series Logistics</td>
+                        <td class="py-3 px-3 text-gray-400">Stadium Ops</td>
+                        <td class="py-3 px-3">Facilities / Pitch Testing</td>
+                        <td class="py-3 px-3"><span class="text-yellow-400 text-xs font-semibold">IN PROGRESS</span></td>
+                    </tr>
+                `
             }
         };
 
-        // --- Render Logic ---
-        function updateDashboard(teamKey) {
-            const data = franchiseData[teamKey];
-            if(!data) return;
+        // Fallback simple ticket data for others
+        const genericTickets = `
+            <tr class="border-b border-gray-600/30 hover:bg-gray-700/40 transition">
+                <td class="py-3 px-3 text-blue-400 font-mono text-xs">GEN-001</td>
+                <td class="py-3 px-3"><span class="bg-gray-700 text-gray-300 text-xs px-2 py-1 rounded">P2 - Normal</span></td>
+                <td class="py-3 px-3 text-gray-200">Standard Operations Review</td>
+                <td class="py-3 px-3 text-gray-400">Management</td>
+                <td class="py-3 px-3">Pending Executive Assignment</td>
+                <td class="py-3 px-3"><span class="text-gray-400 text-xs font-semibold">BACKLOG</span></td>
+            </tr>
+        `;
 
-            // Update Background Engine
-            document.getElementById('bg-image').style.backgroundImage = `url('${data.bgImage}')`;
-            
-            // Update Header Logo
-            document.getElementById('header-logo').src = `https://ui-avatars.com/api/?name=${data.logoInitials}&background=${data.logoColor}&color=fff&bold=true`;
+        function switchTeam(teamKey) {
+            // Update buttons
+            document.querySelectorAll('.team-btn').forEach(btn => {
+                btn.classList.remove('bg-gray-700', 'text-white');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById(`btn-${teamKey}`);
+            activeBtn.classList.remove('text-gray-400');
+            activeBtn.classList.add('bg-gray-700', 'text-white');
 
-            // Update Briefing (Bullet points)
-            const briefingHtml = data.briefing.map(point => `<p class="flex items-start"><i class="ph-fill ph-caret-right text-gold mt-1 mr-2 shrink-0"></i> <span>${point}</span></p>`).join('');
-            document.getElementById('briefing-content').innerHTML = briefingHtml;
-
-            // Update KPIs
-            const updateKpi = (num, kpiData) => {
-                document.getElementById(`kpi${num}-title`).innerText = kpiData.title;
-                document.getElementById(`kpi${num}-value`).innerText = kpiData.val;
-                document.getElementById(`kpi${num}-status`).innerText = kpiData.status;
-                
-                // Color formatting
-                const card = document.getElementById(`kpi${num}-title`).parentElement.parentElement;
-                card.className = `glass-panel p-5 rounded-xl border-l-4 border-l-${kpiData.color} hover:bg-white/[0.02] transition-all duration-300 relative group`;
-                
-                const icon = document.getElementById(`kpi${num}-icon`);
-                icon.className = `ph-fill ${kpiData.icon} text-${kpiData.color} mr-1.5 mt-0.5 shrink-0`;
+            const data = dataStore[teamKey] || {
+                bg: 'https://images.unsplash.com/photo-1508344928928-7137b29339d0?q=80&w=2000&auto=format&fit=crop',
+                header: teamKey.toUpperCase() + ' Proxy',
+                briefing: 'Awaiting strategic data ingestion for this entity. Connect Python/Alteryx pipeline to populate live metrics.',
+                obj: 'Establish Data Pipeline', risk: 'N/A',
+                kpi1: { title: 'Metric 1', val: '---', sub: 'Pending', color: 'gray' },
+                kpi2: { title: 'Metric 2', val: '---', sub: 'Pending', color: 'gray' },
+                kpi3: { title: 'Metric 3', val: '---', sub: 'Pending', color: 'gray' },
+                kpi4: { title: 'Metric 4', val: '---', sub: 'Pending', color: 'gray' },
+                tickets: genericTickets
             };
 
-            updateKpi(1, data.kpi1);
-            updateKpi(2, data.kpi2);
-            updateKpi(3, data.kpi3);
-            updateKpi(4, data.kpi4);
+            // Update DOM
+            document.getElementById('app-body').style.backgroundImage = `url('${data.bg}')`;
+            document.getElementById('team-name-header').innerText = data.header;
+            document.getElementById('briefing-text').innerText = data.briefing;
+            document.getElementById('objective-text').innerText = data.obj;
+            document.getElementById('risk-text').innerText = data.risk;
+            document.getElementById('ticket-body').innerHTML = data.tickets;
 
-            // Update Jira Action Register
-            const tbody = document.getElementById('actions-tbody');
-            tbody.innerHTML = '';
-            data.actions.forEach(a => {
-                tbody.innerHTML += `
-                    <tr class="border-b border-white/5 hover:bg-white/[0.03] transition-colors group">
-                        <td class="py-3 px-4 text-center">
-                            <input type="checkbox" class="jira-checkbox">
-                        </td>
-                        <td class="py-3 px-4">
-                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold border ${a.prioColor}">
-                                ${a.priority}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4">
-                            <div class="text-gray-200 font-medium text-xs mb-0.5 group-hover:text-gold transition-colors cursor-pointer">${a.task}</div>
-                            <div class="text-[10px] text-gray-500 font-mono">${a.id} • Cross-Functional</div>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${a.statusColor}">
-                                ${a.status}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <div class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-700 border border-gray-500 text-[10px] text-white font-bold" title="Assignee: ${a.assignee}">
-                                ${a.assignee}
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
+            for(let i=1; i<=4; i++) {
+                const kpi = data[`kpi${i}`];
+                document.getElementById(`kpi-${i}-title`).innerText = kpi.title;
+                document.getElementById(`kpi-${i}-val`).innerText = kpi.val;
+                document.getElementById(`kpi-${i}-sub`).innerText = kpi.sub;
+            }
         }
 
-        // Initialize with default
-        document.addEventListener("DOMContentLoaded", () => updateDashboard('como'));
+        // Initialize default view
+        switchTeam('como');
     </script>
 </body>
 </html>
