@@ -430,6 +430,96 @@
         }
         
         switchTeam('como');
-    </script>
+    </script><script>
+const CLUB_DATA = {
+  "Como 1907": {
+    league: "Serie A",
+    currency: "€",
+    rev: "€65.0M",
+    wagesToTurnover: "62.5%",
+    debtToEquity: "0.14",
+    amortizationRev: "17.1%",
+    status: "COMPLIANT / OPTIMAL (UEFA SCR 70%)"
+  },
+  "Real Madrid": {
+    league: "La Liga",
+    currency: "€",
+    rev: "€1,045.0M",
+    wagesToTurnover: "51.2%",
+    debtToEquity: "0.21",
+    amortizationRev: "11.8%",
+    status: "COMPLIANT / OPTIMAL (UEFA SCR 70%)"
+  },
+  "Man Utd": {
+    league: "Premier League",
+    currency: "£",
+    rev: "£662.0M",
+    wagesToTurnover: "68.4%",
+    debtToEquity: "0.89",
+    amortizationRev: "13.4%",
+    status: "WATCHLIST — WITHIN 3% OF 70% SCR CAP"
+  },
+  "GSW": {
+    league: "NBA",
+    currency: "$",
+    rev: "$780.0M",
+    wagesToTurnover: "25.5%",
+    debtToEquity: "0.32",
+    amortizationRev: "2.9%",
+    status: "OVER NBA SECOND APRON ($188.9M)"
+  },
+  "Bengals": {
+    league: "NFL",
+    currency: "$",
+    rev: "$545.0M",
+    wagesToTurnover: "46.3%",
+    debtToEquity: "0.18",
+    amortizationRev: "2.6%",
+    status: "COMPLIANT (NFL HARD CAP $255.4M)"
+  }
+};
+
+function switchClub(clubName, btnElement) {
+  const data = CLUB_DATA[clubName];
+  if (!data) return;
+
+  // 1. Update active pill styling in header
+  document.querySelectorAll('.club-btn, [data-club]').forEach(btn => {
+    btn.classList.remove('active', 'bg-amber-500', 'text-slate-950');
+  });
+  if (btnElement) {
+    btnElement.classList.add('active');
+  }
+
+  // 2. Update KPI metrics if matching IDs exist in your layout
+  const wageEl = document.getElementById('kpi-wages-ratio');
+  const debtEl = document.getElementById('kpi-debt-equity');
+  const amortEl = document.getElementById('kpi-amort-ratio');
+  if (wageEl) wageEl.textContent = data.wagesToTurnover;
+  if (debtEl) debtEl.textContent = data.debtToEquity;
+  if (amortEl) amortEl.textContent = data.amortizationRev;
+
+  // 3. Dynamically filter the embedded Tableau Public iframe
+  const tableauFrame = document.querySelector('iframe[src*="public.tableau.com"]');
+  if (tableauFrame) {
+    const baseUrl = tableauFrame.src.split('?')[0];
+    tableauFrame.src = `${baseUrl}?:showVizHome=no&:embed=true&Club_ID=${encodeURIComponent(clubName)}`;
+  }
+}
+
+// Automatically bind click listeners to any header buttons matching the 5 club names
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('button, a').forEach(el => {
+    const label = el.textContent.trim();
+    if (CLUB_DATA[label]) {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchClub(label, el);
+      });
+    }
+  });
+});
+</script>
 </body>
 </html>
